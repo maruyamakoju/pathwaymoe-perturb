@@ -4,3 +4,36 @@ shard 25/803 cells=733,850 conds=4680 ctrls=50 45s
 shard 50/803 cells=1,439,475 conds=4696 ctrls=50 80s
 shard 75/803 cells=2,145,100 conds=4698 ctrls=50 124s
 shard 100/803 cells=2,850,725 conds=4700 ctrls=50 182s
+shard 125/803 cells=3,556,350 conds=4700 ctrls=50 243s
+shard 150/803 cells=4,261,975 conds=4700 ctrls=50 303s
+shard 175/803 cells=4,967,600 conds=4700 ctrls=50 345s
+shard 200/803 cells=5,673,225 conds=4700 ctrls=50 386s
+shard 225/803 cells=6,378,850 conds=4700 ctrls=50 433s
+shard 250/803 cells=7,084,475 conds=4700 ctrls=50 502s
+shard 275/803 cells=7,790,100 conds=4700 ctrls=50 574s
+shard 300/803 cells=8,495,725 conds=4700 ctrls=50 646s
+shard 325/803 cells=9,201,350 conds=4700 ctrls=50 733s
+shard 350/803 cells=9,906,975 conds=4700 ctrls=50 838s
+shard 375/803 cells=10,612,600 conds=4700 ctrls=50 948s
+shard 400/803 cells=11,318,225 conds=4700 ctrls=50 1051s
+shard 425/803 cells=12,023,850 conds=4700 ctrls=50 1165s
+shard 450/803 cells=12,729,475 conds=4700 ctrls=50 1295s
+shard 475/803 cells=13,435,100 conds=4700 ctrls=50 1426s
+shard 500/803 cells=14,140,725 conds=4700 ctrls=50 1546s
+shard 525/803 cells=14,846,350 conds=4700 ctrls=50 1680s
+shard 550/803 cells=15,551,975 conds=4700 ctrls=50 1818s
+shard 575/803 cells=16,257,600 conds=4700 ctrls=50 1952s
+shard 600/803 cells=16,963,225 conds=4700 ctrls=50 2069s
+shard 625/803 cells=17,668,850 conds=4700 ctrls=50 2144s
+shard 650/803 cells=18,374,475 conds=4700 ctrls=50 2207s
+shard 675/803 cells=19,080,100 conds=4700 ctrls=50 2264s
+shard 700/803 cells=19,785,725 conds=4700 ctrls=50 2315s
+shard 725/803 cells=20,491,350 conds=9276 ctrls=50 2388s
+shard 750/803 cells=21,196,975 conds=9291 ctrls=50 2461s
+shard 775/803 cells=21,902,600 conds=9297 ctrls=50 2534s
+shard 800/803 cells=22,608,225 conds=9299 ctrls=50 2610s
+aggregation done: 22,664,673 cells, 13718 raw conditions
+8875 conditions pass thresholds (min_cells=50)
+selected 2000 HVGs by cross-condition LFC variance
+wrote 8875 conditions x 2000 genes -> E:\vc_project_data\data\tahoe_full\processed
+mean cells/cond=2480, mean DEGs/cond=20.2
