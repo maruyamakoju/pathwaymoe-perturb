@@ -16,10 +16,12 @@ from metrics import compute_metrics
 import scipy.sparse as sp
 
 
-def load_priors(dataset, n_genes):
+def load_priors(dataset, n_genes, grn_file="grn_mask.npz"):
     pri = DATA_ROOT / "data" / "priors" / dataset
-    grn = sp.load_npz(pri / "grn_mask.npz").toarray().astype(bool) if (pri / "grn_mask.npz").exists() else None
     gp = sp.load_npz(pri / "pathways.npz").toarray() if (pri / "pathways.npz").exists() else None
+    grn = sp.load_npz(pri / grn_file).toarray().astype(bool) if (pri / grn_file).exists() else None
+    if grn is not None:
+        print(f"GRN prior: {pri / grn_file} ({grn.sum()} edges)")
     return grn, gp
 
 
@@ -79,6 +81,8 @@ def main():
     ap.add_argument("--eval-every", type=int, default=2)
     ap.add_argument("--patience", type=int, default=20)
     ap.add_argument("--no-grn", action="store_true")
+    ap.add_argument("--grn-file", default="grn_mask.npz", help="GRN variant npz in priors/<dataset>/")
+    ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--no-moe", action="store_true")
     ap.add_argument("--no-pathway-prior", action="store_true")
     ap.add_argument("--pert-as-token", action="store_true")
@@ -86,9 +90,12 @@ def main():
     ap.add_argument("--wandb", action="store_true")
     args = ap.parse_args()
 
-    torch.manual_seed(SEED); np.random.seed(SEED)
+    torch.manual_seed(args.seed); np.random.seed(args.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    grn_tag = args.grn_file.replace("grn_", "").replace(".npz", "")
     name = args.name or f"{args.dataset}_{args.split}_{args.size}"
+    if args.grn_file != "grn_mask.npz": name += f"_{grn_tag}"
+    if args.seed != SEED: name += f"_s{args.seed}"
     if args.no_grn: name += "_nogrn"
     if args.no_moe: name += "_nomoe"
     if args.no_pathway_prior: name += "_noprior"
@@ -99,10 +106,10 @@ def main():
     genes = load_genes(args.dataset)
     shared = build_shared(args.dataset, df)
     n_genes = shared["n_genes"]; cb_dim = shared["cb_dim"]
-    grn, gp = load_priors(args.dataset, n_genes)
+    grn, gp = load_priors(args.dataset, n_genes, args.grn_file)
     n_experts = gp.shape[1] if gp is not None else 16
 
-    sp_ = make_splits(df, args.split, seed=SEED)
+    sp_ = make_splits(df, args.split, seed=SEED)   # FIXED split seed: identical test set across runs
     print(f"split {args.split}: train={len(sp_['train'])} val={len(sp_['val'])} test={len(sp_['test'])}")
     tr = make_loader(args.dataset, sp_["train"], df, shared, args.batch_size, shuffle=True)
     va = make_loader(args.dataset, sp_["val"], df, shared, args.batch_size, shuffle=False)

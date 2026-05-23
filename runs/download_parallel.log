@@ -1,0 +1,18 @@
+40/680 done, 522s, ~0.1 shards/s, last=161:ok
+80/680 done, 938s, ~0.1 shards/s, last=200:ok
+120/680 done, 1377s, ~0.1 shards/s, last=241:ok
+160/680 done, 1746s, ~0.1 shards/s, last=281:ok
+200/680 done, 2125s, ~0.1 shards/s, last=319:ok
+240/680 done, 2479s, ~0.1 shards/s, last=361:ok
+280/680 done, 2822s, ~0.1 shards/s, last=396:ok
+320/680 done, 3147s, ~0.1 shards/s, last=439:ok
+360/680 done, 3542s, ~0.1 shards/s, last=480:ok
+400/680 done, 3985s, ~0.1 shards/s, last=519:ok
+440/680 done, 4402s, ~0.1 shards/s, last=561:ok
+480/680 done, 4825s, ~0.1 shards/s, last=600:ok
+520/680 done, 5233s, ~0.1 shards/s, last=638:ok
+560/680 done, 5679s, ~0.1 shards/s, last=679:ok
+600/680 done, 6051s, ~0.1 shards/s, last=718:ok
+640/680 done, 6372s, ~0.1 shards/s, last=758:ok
+680/680 done, 6658s, ~0.1 shards/s, last=798:ok
+PARALLEL DL DONE 680

@@ -1,0 +1,6 @@
+streaming 803 shards, vocab=62713
+shard 0/803 cells=28,225 conds=3026 ctrls=0 5s
+shard 25/803 cells=733,850 conds=4680 ctrls=50 45s
+shard 50/803 cells=1,439,475 conds=4696 ctrls=50 80s
+shard 75/803 cells=2,145,100 conds=4698 ctrls=50 124s
+shard 100/803 cells=2,850,725 conds=4700 ctrls=50 182s

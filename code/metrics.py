@@ -27,13 +27,10 @@ def _pearson(a: np.ndarray, b: np.ndarray) -> float:
 
 def _condition_metrics(pred: np.ndarray, true: np.ndarray, deg_mask: np.ndarray | None) -> dict:
     out = {"pearson_all": _pearson(pred, true), "mse": float(np.mean((pred - true) ** 2))}
-    # candidate DEG set
-    if deg_mask is None:
-        cand = np.abs(true) > LFC_THRESH
-    else:
-        cand = deg_mask.astype(bool) & (np.abs(true) > LFC_THRESH)
-    cand_idx = np.where(cand)[0]
-    order = cand_idx[np.argsort(-np.abs(true[cand_idx]))]  # by |true_lfc| desc
+    # DEG-Pearson@K = Pearson on the K genes with largest |true_lfc| (the biggest movers).
+    # Dataset-agnostic and standard; avoids threshold degeneracy when log-normalized LFCs are small.
+    # (deg_mask is retained in the schema as a record of significant DEGs but not used to gate here.)
+    order = np.argsort(-np.abs(true))
     for k in DEG_KS:
         sel = order[:k]
         if sel.size >= 2:
