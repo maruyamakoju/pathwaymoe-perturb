@@ -33,6 +33,7 @@ VARIANT_FLAGS = {
     "trrust": ["--grn-file", "grn_trrust.npz"],
     "coexpr": ["--grn-file", "grn_coexpr.npz"],
     "coexpr_lfc": ["--grn-file", "grn_coexpr_lfc.npz"],
+    "ground_truth": ["--grn-file", "grn_ground_truth.npz"],
 }
 
 
@@ -65,7 +66,8 @@ def train_one(dataset, split, variant, seed, epochs, size="base", batch=64):
 
 
 VARIANT_GRNFILE = {"none": None, "random": "grn_random.npz", "trrust": "grn_trrust.npz",
-                   "coexpr": "grn_coexpr.npz", "coexpr_lfc": "grn_coexpr_lfc.npz"}
+                   "coexpr": "grn_coexpr.npz", "coexpr_lfc": "grn_coexpr_lfc.npz",
+                   "ground_truth": "grn_ground_truth.npz"}
 
 
 def predict_test(dataset, name, variant, df, shared, test_idx, device):

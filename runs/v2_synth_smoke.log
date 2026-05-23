@@ -1,0 +1,50 @@
+=== synthetic__unseen_drug__base__none === params=23,908,945 variant=none grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.042 val_all=0.007
+  ep  2 val_DEG50=0.179 val_all=0.033
+  ep  4 val_DEG50=0.419 val_all=0.107
+  ep  6 val_DEG50=0.474 val_all=0.134
+  ep  8 val_DEG50=0.480 val_all=0.152
+  ep  9 val_DEG50=0.493 val_all=0.163
+  best val DEG50=0.493 -> E:\vc_project_data\checkpoints\synthetic__unseen_drug__base__none.pt
+=== synthetic__unseen_drug__base__random === params=23,908,945 variant=random grn_edges=4530 device=cuda
+  ep  0 val_DEG50=0.052 val_all=0.008
+  ep  2 val_DEG50=0.192 val_all=0.036
+  ep  4 val_DEG50=0.432 val_all=0.112
+  ep  6 val_DEG50=0.482 val_all=0.138
+  ep  8 val_DEG50=0.489 val_all=0.155
+  ep  9 val_DEG50=0.487 val_all=0.155
+  best val DEG50=0.489 -> E:\vc_project_data\checkpoints\synthetic__unseen_drug__base__random.pt
+=== synthetic__unseen_drug__base__ground_truth === params=23,908,945 variant=ground_truth grn_edges=4530 device=cuda
+  ep  0 val_DEG50=0.050 val_all=0.008
+  ep  2 val_DEG50=0.186 val_all=0.036
+  ep  4 val_DEG50=0.428 val_all=0.111
+  ep  6 val_DEG50=0.481 val_all=0.138
+  ep  8 val_DEG50=0.489 val_all=0.156
+  ep  9 val_DEG50=0.490 val_all=0.150
+  best val DEG50=0.490 -> E:\vc_project_data\checkpoints\synthetic__unseen_drug__base__ground_truth.pt
+=== synthetic__unseen_drug__base__coexpr_lfc === params=23,908,945 variant=coexpr_lfc grn_edges=100 device=cuda
+  ep  0 val_DEG50=0.057 val_all=0.009
+  ep  2 val_DEG50=0.208 val_all=0.040
+  ep  4 val_DEG50=0.443 val_all=0.115
+  ep  6 val_DEG50=0.485 val_all=0.140
+  ep  8 val_DEG50=0.493 val_all=0.155
+  ep  9 val_DEG50=0.490 val_all=0.152
+  best val DEG50=0.493 -> E:\vc_project_data\checkpoints\synthetic__unseen_drug__base__coexpr_lfc.pt
+
+=== unseen_drug  (n_test=270, clusters=9) ===
+  baseline B1_mean_effect   0.595 [0.412,0.771]
+  baseline B2_ridge         -0.048 [-0.375,0.288]
+  baseline B3_ridge_bio     0.631 [0.431,0.795]
+  GRNprop[random        ] 0.167 [0.093,0.232]
+  GRNprop[ground_truth  ] 0.158 [0.081,0.243]
+  GRNprop[coexpr_lfc    ] 0.167 [0.093,0.232]
+  MoE[none          ]   0.516 [0.316,0.708] (n=1)
+  MoE[random        ]   0.552 [0.374,0.724] (n=1)
+  MoE[ground_truth  ]   0.541 [0.349,0.724] (n=1)
+  MoE[coexpr_lfc    ]   0.549 [0.366,0.724] (n=1)
+  random_vs_none: Δ=+0.035 p_holm=0.008 ***
+  coexpr_lfc_vs_none: Δ=+0.033 p_holm=0.000 ***
+  ground_truth_vs_none: Δ=+0.025 p_holm=0.000 ***
+  coexpr_lfc_vs_random: Δ=-0.003 p_holm=0.710 
+
+wrote C:\Users\07013\Desktop\0522rd4\results\study_synthetic_v2.json

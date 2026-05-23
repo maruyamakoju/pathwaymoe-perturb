@@ -1,0 +1,163 @@
+{
+  "manifest": {
+    "dataset": "synthetic",
+    "n_genes": 2000,
+    "n_conditions": 1410,
+    "n_cells_total": null,
+    "n_shards": null,
+    "genes_sha1": "73fd13e31c46",
+    "cell_lines": 10
+  },
+  "splits": {
+    "unseen_drug": {
+      "n_test": 270,
+      "n_clusters": 9,
+      "baselines": {
+        "B1_mean_effect": {
+          "deg50": 0.5945339126816139,
+          "ci": [
+            0.41154668374651104,
+            0.7713419563414823
+          ]
+        },
+        "B2_ridge": {
+          "deg50": -0.04805095104078504,
+          "ci": [
+            -0.37520430370475394,
+            0.28795469931966117
+          ]
+        },
+        "B3_ridge_bio": {
+          "deg50": 0.6310888330220379,
+          "ci": [
+            0.43131875824187815,
+            0.7950428493365218
+          ]
+        }
+      },
+      "grn_prop": {
+        "random": {
+          "deg50": 0.16718270551572736,
+          "ci": [
+            0.09304779978144007,
+            0.2319252975854032
+          ]
+        },
+        "ground_truth": {
+          "deg50": 0.1578556032792249,
+          "ci": [
+            0.08143292339780824,
+            0.24250859099765218
+          ]
+        },
+        "coexpr_lfc": {
+          "deg50": 0.167444459956968,
+          "ci": [
+            0.09309676902985332,
+            0.23223357223504434
+          ]
+        }
+      },
+      "model": {
+        "none": {
+          "deg50": 0.5164836740663059,
+          "ci": [
+            0.31630533971083674,
+            0.7078799705089331
+          ],
+          "n_seeds": 1,
+          "seed_mean": 0.516483674066306,
+          "seed_std": 0.0
+        },
+        "random": {
+          "deg50": 0.5516776883205574,
+          "ci": [
+            0.37422499508008644,
+            0.7235492401229685
+          ],
+          "n_seeds": 1,
+          "seed_mean": 0.5516776883205574,
+          "seed_std": 0.0
+        },
+        "ground_truth": {
+          "deg50": 0.5412754701332807,
+          "ci": [
+            0.34929336207259604,
+            0.7243014034684683
+          ],
+          "n_seeds": 1,
+          "seed_mean": 0.5412754701332807,
+          "seed_std": 0.0
+        },
+        "coexpr_lfc": {
+          "deg50": 0.5490763414030105,
+          "ci": [
+            0.3660483705670735,
+            0.724474727319086
+          ],
+          "n_seeds": 1,
+          "seed_mean": 0.5490763414030105,
+          "seed_std": 0.0
+        }
+      },
+      "contrasts": {
+        "random_vs_none": {
+          "delta": 0.03519401425425143,
+          "ci": [
+            0.010633494205246107,
+            0.061552262403519215
+          ],
+          "p": 0.004,
+          "p_holm": 0.008,
+          "p_corrected": 0.008,
+          "min_effect": 0.01,
+          "significant": true,
+          "meaningful": true,
+          "significant_and_meaningful": true
+        },
+        "coexpr_lfc_vs_none": {
+          "delta": 0.03259266733670452,
+          "ci": [
+            0.013890810717369641,
+            0.053778520474193604
+          ],
+          "p": 0.0,
+          "p_holm": 0.0,
+          "p_corrected": 0.0,
+          "min_effect": 0.01,
+          "significant": true,
+          "meaningful": true,
+          "significant_and_meaningful": true
+        },
+        "ground_truth_vs_none": {
+          "delta": 0.02479179606697479,
+          "ci": [
+            0.013999261642851871,
+            0.03626843961997305
+          ],
+          "p": 0.0,
+          "p_holm": 0.0,
+          "p_corrected": 0.0,
+          "min_effect": 0.01,
+          "significant": true,
+          "meaningful": true,
+          "significant_and_meaningful": true
+        },
+        "coexpr_lfc_vs_random": {
+          "delta": -0.002601346917546915,
+          "ci": [
+            -0.014945206818233516,
+            0.007898423086045839
+          ],
+          "p": 0.71,
+          "p_holm": 0.71,
+          "p_corrected": 0.71,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        }
+      }
+    }
+  }
+}

@@ -1,1 +1,5 @@
 [train] tahoe_full_unseen_drug_base_nogrn  ::  --no-grn seed=1337
+ep 22 step1564 loss=0.1061 val_DEG50=0.855 val_all=0.721 dir50=0.955
+ep 24 step1700 loss=0.1058 val_DEG50=0.858 val_all=0.724 dir50=0.957
+best val DEG50=0.858 -> saved E:\vc_project_data\checkpoints\tahoe_full_unseen_drug_base_nogrn.pt
+[train] tahoe_full_unseen_drug_base_s1_nogrn  ::  --no-grn seed=1

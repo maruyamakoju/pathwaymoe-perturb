@@ -86,17 +86,24 @@ def _topk_corr_edges(M, k, exclude_self=True):
     return edges
 
 
-def build(dataset, with_genie3=False):
+def build(dataset, with_genie3=False, ground_truth=False):
     genes = load_genes(dataset)
     n = len(genes)
     df = load_conditions(dataset)
     print(f"[{dataset}] {n} genes, {len(df)} conditions")
 
-    tr = trrust_edges(genes)
-    n_edges = max(len(tr), 100)
-    print(f"matched edge budget = {n_edges} (TRRUST)")
-
-    _save(genes, tr, dataset, "trrust", "TRRUST_v2")
+    if ground_truth:
+        # synthetic: the existing grn_mask.npz IS the true GRN; use its density as the budget.
+        gt = sp.load_npz(PRIORS / dataset / "grn_mask.npz").tocoo()
+        gt_edges = set(zip(gt.row.tolist(), gt.col.tolist()))
+        _save(genes, gt_edges, dataset, "ground_truth", "synthetic_ground_truth")
+        n_edges = max(len(gt_edges), 100)
+        print(f"matched edge budget = {n_edges} (ground-truth GRN)")
+    else:
+        tr = trrust_edges(genes)
+        n_edges = max(len(tr), 100)
+        print(f"matched edge budget = {n_edges} (TRRUST)")
+        _save(genes, tr, dataset, "trrust", "TRRUST_v2")
     rng = np.random.default_rng(1337)
     rand = set()
     while len(rand) < n_edges:
@@ -126,5 +133,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", default="tahoe_full")
     ap.add_argument("--genie3", action="store_true")
+    ap.add_argument("--ground-truth", action="store_true", help="synthetic: include true GRN variant")
     a = ap.parse_args()
-    build(a.dataset, a.genie3)
+    build(a.dataset, a.genie3, a.ground_truth)
