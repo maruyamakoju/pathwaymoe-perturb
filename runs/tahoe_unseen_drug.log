@@ -1,0 +1,7 @@
+=== tahoe_unseen_drug_base on cuda ===
+split unseen_drug: train=2067 val=229 test=583
+params=44,962,465 d=256 L=4 E=40 grn=True moe=True
+optimizer: torch.AdamW
+ep  0 step  33 loss=0.3078 val_DEG50=0.166 val_all=0.068 dir50=0.626
+ep  2 step  99 loss=0.2108 val_DEG50=0.454 val_all=0.240 dir50=0.790
+ep  4 step 165 loss=0.2244 val_DEG50=0.504 val_all=0.282 dir50=0.820
