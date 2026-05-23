@@ -67,6 +67,8 @@ def run_grid(dataset, splits, variants, seeds, tc: TrainConfig, size="base"):
                     print(f"[skip] {run.name}", flush=True); continue
                 try:
                     train(dataset, split, variant, seed, tc, size)
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
                 except Exception as e:
                     import traceback
                     print(f"[FAIL] {run.name}: {type(e).__name__}: {e}", flush=True)

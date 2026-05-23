@@ -33,9 +33,15 @@ pseudobulk log-fold-change over N genes. Only the GRN mask is varied; everything
 All masks share the gene space and are matched to TRRUST's edge count (only *which* edges differ):
 - **none** — GRN masking disabled (dense attention).
 - **random** — random edges, matched density (controls for "any sparse mask").
-- **trrust** — TRRUST v2 curated human TF→target (generic prior; symbol→Ensembl mapped).
-- **coexpr** — top gene–gene Pearson correlations of pseudobulk expression (data-derived, observational).
-- **coexpr_lfc** — top gene–gene correlations of LFC across conditions (data-derived, perturbation co-response).
+- **trrust** — TRRUST v2 curated human TF→target, binary (generic prior; symbol→Ensembl mapped).
+- **trrust_weighted** — same edges, signed/weighted (Activation +, Repression −) → weighted attention bias (audit F).
+- **coexpr** — top gene–gene corr of pseudobulk expression, **train conditions only** (data-derived, observational).
+- **coexpr_lfc** — top gene–gene corr of LFC across **train conditions only** (data-derived, perturbation co-response).
+- **ground_truth** (synthetic only) — the true generative GRN (upper bound).
+
+**Leakage control (audit A/B):** data-derived GRNs are built from the split's TRAIN indices only and
+are split-specific (`grn_<v>__<split>.npz`, recorded `leakage_safe=true`); a regression test asserts
+that perturbing test-set rows does not change the GRN.
 
 ### 2.3 Data
 - **Synthetic** (positive control): 2,000 genes, 20 pathways, known signed GRN with pathway-localized
@@ -48,12 +54,18 @@ All masks share the gene space and are matched to TRRUST's edge count (only *whi
   TRRUST v2 GRN + Reactome pathways (Ensembl-aligned).
 
 ### 2.4 Splits, metric, statistics
-Leakage-controlled splits (seed fixed so the test set is identical across all runs): unseen_drug
-(Butina/Tanimoto<0.8 dedup), unseen_cell_line, unseen_both. Primary metric: **DEG-Pearson@50** =
-Pearson on the 50 genes with largest |true LFC| per condition (dataset-agnostic). Linear baselines:
-B1 mean-effect, B2 ridge(ChemBERTa+cell line+baseline), B3 ridge+biology. Each model config trained
-with **3 seeds**; we report mean and 95% bootstrap CI over test conditions, and **paired bootstrap**
-significance for between-variant deltas (resampling conditions).
+Leakage-controlled splits (split seed FIXED so the test set is identical across all variants and model
+seeds): unseen_drug (Butina/Tanimoto<0.8 dedup), unseen_cell_line, unseen_both. Primary metric:
+**DEG-Pearson@50** = Pearson on the 50 genes with largest |true LFC| per condition (dataset-agnostic).
+Reference baselines: B1 mean-effect, B2/B3 ridge; plus a **GRN-propagation baseline** (audit E) — a
+GRN-only linear message-passing model with no deep net, evaluated under each GRN variant to test
+whether *any* model benefits from a given GRN.
+Statistics (audit C/D/G): each config trained with **3 seeds**; point estimate = per-condition mean
+over seeds; **cluster bootstrap** (resampling the grouping variable — drugs for unseen_drug/both,
+cell-lines for unseen_cell_line) for 95% CIs and **paired cluster bootstrap** for between-variant
+deltas; **Holm–Bonferroni** correction across the planned contrasts; effects called
+"significant *and* meaningful" only when Holm-p<0.05 AND |Δ| ≥ 0.01 (pre-registered minimum effect).
+We report the number of test clusters per split as the true effective sample size.
 
 ## 3. Results
 
