@@ -1,0 +1,46 @@
+=== tahoe_unseen_both_base on cuda ===
+split unseen_both: train=1803 val=200 test=87
+params=44,962,465 d=256 L=4 E=40 grn=True moe=True
+optimizer: torch.AdamW
+ep  0 step  29 loss=0.3694 val_DEG50=0.138 val_all=0.058 dir50=0.563
+ep  2 step  87 loss=0.2018 val_DEG50=0.444 val_all=0.227 dir50=0.759
+ep  4 step 145 loss=0.2515 val_DEG50=0.476 val_all=0.268 dir50=0.800
+ep  6 step 203 loss=0.2581 val_DEG50=0.495 val_all=0.285 dir50=0.739
+ep  8 step 261 loss=0.1928 val_DEG50=0.523 val_all=0.305 dir50=0.832
+ep 10 step 319 loss=0.1918 val_DEG50=0.506 val_all=0.299 dir50=0.818
+ep 12 step 377 loss=0.2093 val_DEG50=0.542 val_all=0.322 dir50=0.842
+ep 14 step 435 loss=0.1954 val_DEG50=0.538 val_all=0.327 dir50=0.807
+ep 16 step 493 loss=0.1988 val_DEG50=0.585 val_all=0.355 dir50=0.865
+ep 18 step 551 loss=0.1824 val_DEG50=0.590 val_all=0.363 dir50=0.865
+ep 20 step 609 loss=0.1976 val_DEG50=0.598 val_all=0.371 dir50=0.879
+ep 22 step 667 loss=0.1914 val_DEG50=0.587 val_all=0.371 dir50=0.876
+ep 24 step 725 loss=0.1829 val_DEG50=0.618 val_all=0.388 dir50=0.890
+ep 26 step 783 loss=0.1882 val_DEG50=0.636 val_all=0.395 dir50=0.895
+ep 28 step 841 loss=0.1791 val_DEG50=0.629 val_all=0.405 dir50=0.894
+ep 30 step 899 loss=0.1967 val_DEG50=0.647 val_all=0.422 dir50=0.907
+ep 32 step 957 loss=0.1761 val_DEG50=0.656 val_all=0.434 dir50=0.913
+ep 34 step1015 loss=0.1797 val_DEG50=0.666 val_all=0.446 dir50=0.918
+ep 36 step1073 loss=0.1920 val_DEG50=0.674 val_all=0.458 dir50=0.923
+ep 38 step1131 loss=0.1557 val_DEG50=0.676 val_all=0.466 dir50=0.925
+ep 40 step1189 loss=0.1795 val_DEG50=0.697 val_all=0.479 dir50=0.929
+ep 42 step1247 loss=0.1925 val_DEG50=0.704 val_all=0.489 dir50=0.932
+ep 44 step1305 loss=0.1687 val_DEG50=0.713 val_all=0.498 dir50=0.939
+ep 46 step1363 loss=0.1804 val_DEG50=0.714 val_all=0.503 dir50=0.939
+ep 48 step1421 loss=0.1906 val_DEG50=0.730 val_all=0.512 dir50=0.945
+ep 50 step1479 loss=0.1887 val_DEG50=0.735 val_all=0.518 dir50=0.942
+ep 52 step1537 loss=0.1696 val_DEG50=0.732 val_all=0.523 dir50=0.946
+ep 54 step1595 loss=0.1574 val_DEG50=0.741 val_all=0.528 dir50=0.949
+ep 56 step1653 loss=0.1656 val_DEG50=0.740 val_all=0.531 dir50=0.950
+ep 58 step1711 loss=0.1664 val_DEG50=0.749 val_all=0.536 dir50=0.951
+ep 60 step1769 loss=0.1696 val_DEG50=0.751 val_all=0.539 dir50=0.951
+ep 62 step1827 loss=0.1646 val_DEG50=0.752 val_all=0.541 dir50=0.954
+ep 64 step1885 loss=0.1652 val_DEG50=0.754 val_all=0.544 dir50=0.955
+ep 66 step1943 loss=0.1729 val_DEG50=0.758 val_all=0.546 dir50=0.956
+ep 68 step2001 loss=0.1579 val_DEG50=0.760 val_all=0.548 dir50=0.957
+ep 70 step2059 loss=0.1590 val_DEG50=0.759 val_all=0.548 dir50=0.956
+ep 72 step2117 loss=0.1695 val_DEG50=0.761 val_all=0.550 dir50=0.956
+ep 74 step2175 loss=0.1655 val_DEG50=0.760 val_all=0.551 dir50=0.956
+ep 76 step2233 loss=0.1606 val_DEG50=0.763 val_all=0.553 dir50=0.957
+ep 78 step2291 loss=0.1712 val_DEG50=0.764 val_all=0.553 dir50=0.957
+ep 79 step2320 loss=0.1674 val_DEG50=0.764 val_all=0.554 dir50=0.957
+best val DEG50=0.764 -> saved E:\vc_project_data\checkpoints\tahoe_unseen_both_base.pt

@@ -1,0 +1,24 @@
+{
+  "full": {
+    "pearson_all": 0.4595,
+    "mse": 0.1003,
+    "pearson_deg20": 0.6959,
+    "direction_acc20": 0.8745,
+    "pearson_deg50": 0.7044,
+    "direction_acc50": 0.854,
+    "pearson_deg100": 0.7058,
+    "direction_acc100": 0.8458,
+    "delta_vs_full": 0.0
+  },
+  "no_GRN_mask": {
+    "pearson_all": 0.4707,
+    "mse": 0.1006,
+    "pearson_deg20": 0.7004,
+    "direction_acc20": 0.8754,
+    "pearson_deg50": 0.7124,
+    "direction_acc50": 0.8562,
+    "pearson_deg100": 0.7146,
+    "direction_acc100": 0.8485,
+    "delta_vs_full": 0.008
+  }
+}

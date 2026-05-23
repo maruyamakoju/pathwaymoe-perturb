@@ -1,0 +1,46 @@
+=== tahoe_unseen_drug_base_nogrn on cuda ===
+split unseen_drug: train=2067 val=229 test=583
+params=44,962,465 d=256 L=4 E=40 grn=False moe=True
+optimizer: torch.AdamW
+ep  0 step  33 loss=0.3218 val_DEG50=0.128 val_all=0.051 dir50=0.593
+ep  2 step  99 loss=0.2097 val_DEG50=0.441 val_all=0.230 dir50=0.756
+ep  4 step 165 loss=0.2257 val_DEG50=0.486 val_all=0.269 dir50=0.805
+ep  6 step 231 loss=0.2000 val_DEG50=0.489 val_all=0.281 dir50=0.759
+ep  8 step 297 loss=0.1998 val_DEG50=0.516 val_all=0.303 dir50=0.819
+ep 10 step 363 loss=0.2006 val_DEG50=0.531 val_all=0.317 dir50=0.853
+ep 12 step 429 loss=0.2025 val_DEG50=0.555 val_all=0.335 dir50=0.862
+ep 14 step 495 loss=0.1904 val_DEG50=0.563 val_all=0.343 dir50=0.870
+ep 16 step 561 loss=0.2049 val_DEG50=0.584 val_all=0.355 dir50=0.877
+ep 18 step 627 loss=0.1893 val_DEG50=0.591 val_all=0.363 dir50=0.878
+ep 20 step 693 loss=0.1956 val_DEG50=0.616 val_all=0.380 dir50=0.889
+ep 22 step 759 loss=0.1917 val_DEG50=0.624 val_all=0.392 dir50=0.892
+ep 24 step 825 loss=0.1854 val_DEG50=0.640 val_all=0.414 dir50=0.904
+ep 26 step 891 loss=0.1723 val_DEG50=0.661 val_all=0.435 dir50=0.917
+ep 28 step 957 loss=0.1768 val_DEG50=0.668 val_all=0.449 dir50=0.908
+ep 30 step1023 loss=0.1786 val_DEG50=0.690 val_all=0.469 dir50=0.926
+ep 32 step1089 loss=0.1738 val_DEG50=0.712 val_all=0.484 dir50=0.936
+ep 34 step1155 loss=0.1698 val_DEG50=0.719 val_all=0.498 dir50=0.941
+ep 36 step1221 loss=0.1713 val_DEG50=0.729 val_all=0.510 dir50=0.942
+ep 38 step1287 loss=0.1720 val_DEG50=0.736 val_all=0.521 dir50=0.950
+ep 40 step1353 loss=0.1784 val_DEG50=0.747 val_all=0.527 dir50=0.952
+ep 42 step1419 loss=0.1734 val_DEG50=0.752 val_all=0.535 dir50=0.951
+ep 44 step1485 loss=0.1783 val_DEG50=0.755 val_all=0.541 dir50=0.957
+ep 46 step1551 loss=0.1774 val_DEG50=0.757 val_all=0.546 dir50=0.956
+ep 48 step1617 loss=0.1832 val_DEG50=0.764 val_all=0.549 dir50=0.959
+ep 50 step1683 loss=0.1635 val_DEG50=0.766 val_all=0.555 dir50=0.962
+ep 52 step1749 loss=0.1811 val_DEG50=0.768 val_all=0.558 dir50=0.960
+ep 54 step1815 loss=0.1730 val_DEG50=0.769 val_all=0.559 dir50=0.963
+ep 56 step1881 loss=0.1695 val_DEG50=0.773 val_all=0.563 dir50=0.963
+ep 58 step1947 loss=0.1607 val_DEG50=0.773 val_all=0.565 dir50=0.964
+ep 60 step2013 loss=0.1618 val_DEG50=0.775 val_all=0.568 dir50=0.966
+ep 62 step2079 loss=0.1636 val_DEG50=0.777 val_all=0.569 dir50=0.965
+ep 64 step2145 loss=0.1616 val_DEG50=0.777 val_all=0.570 dir50=0.966
+ep 66 step2211 loss=0.1637 val_DEG50=0.778 val_all=0.571 dir50=0.966
+ep 68 step2277 loss=0.1601 val_DEG50=0.779 val_all=0.572 dir50=0.967
+ep 70 step2343 loss=0.1577 val_DEG50=0.781 val_all=0.573 dir50=0.966
+ep 72 step2409 loss=0.1588 val_DEG50=0.780 val_all=0.574 dir50=0.967
+ep 74 step2475 loss=0.1577 val_DEG50=0.781 val_all=0.575 dir50=0.966
+ep 76 step2541 loss=0.1557 val_DEG50=0.781 val_all=0.575 dir50=0.966
+ep 78 step2607 loss=0.1606 val_DEG50=0.781 val_all=0.576 dir50=0.967
+ep 79 step2640 loss=0.1666 val_DEG50=0.781 val_all=0.576 dir50=0.968
+best val DEG50=0.781 -> saved E:\vc_project_data\checkpoints\tahoe_unseen_drug_base_nogrn.pt
