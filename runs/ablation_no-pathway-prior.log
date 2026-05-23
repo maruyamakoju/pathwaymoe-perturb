@@ -1,0 +1,36 @@
+=== synthetic_unseen_drug_base_noprior on cuda ===
+split unseen_drug: train=1026 val=114 test=270
+params=23,908,945 d=256 L=4 E=20 grn=True moe=True
+optimizer: torch.AdamW
+ep  0 step  17 loss=0.7161 val_DEG50=0.060 val_all=0.007 dir50=0.501
+ep  2 step  51 loss=0.1371 val_DEG50=0.117 val_all=0.016 dir50=0.531
+ep  4 step  85 loss=0.3454 val_DEG50=0.284 val_all=0.052 dir50=0.622
+ep  6 step 119 loss=0.2412 val_DEG50=0.389 val_all=0.095 dir50=0.690
+ep  8 step 153 loss=0.2828 val_DEG50=0.455 val_all=0.120 dir50=0.716
+ep 10 step 187 loss=0.1732 val_DEG50=0.488 val_all=0.140 dir50=0.771
+ep 12 step 221 loss=0.2057 val_DEG50=0.476 val_all=0.150 dir50=0.758
+ep 14 step 255 loss=0.1560 val_DEG50=0.488 val_all=0.147 dir50=0.737
+ep 16 step 289 loss=0.2013 val_DEG50=0.508 val_all=0.163 dir50=0.757
+ep 18 step 323 loss=0.1110 val_DEG50=0.490 val_all=0.167 dir50=0.740
+ep 20 step 357 loss=0.1236 val_DEG50=0.503 val_all=0.187 dir50=0.770
+ep 22 step 391 loss=0.1048 val_DEG50=0.506 val_all=0.217 dir50=0.750
+ep 24 step 425 loss=0.4022 val_DEG50=0.548 val_all=0.255 dir50=0.762
+ep 26 step 459 loss=0.1327 val_DEG50=0.535 val_all=0.250 dir50=0.769
+ep 28 step 493 loss=0.4969 val_DEG50=0.575 val_all=0.277 dir50=0.780
+ep 30 step 527 loss=0.2687 val_DEG50=0.594 val_all=0.287 dir50=0.803
+ep 32 step 561 loss=0.4489 val_DEG50=0.627 val_all=0.288 dir50=0.797
+ep 34 step 595 loss=0.1594 val_DEG50=0.630 val_all=0.298 dir50=0.793
+ep 36 step 629 loss=0.2210 val_DEG50=0.650 val_all=0.307 dir50=0.812
+ep 38 step 663 loss=0.2604 val_DEG50=0.675 val_all=0.319 dir50=0.816
+ep 40 step 697 loss=0.1191 val_DEG50=0.697 val_all=0.321 dir50=0.837
+ep 42 step 731 loss=0.1092 val_DEG50=0.704 val_all=0.347 dir50=0.812
+ep 44 step 765 loss=0.1285 val_DEG50=0.704 val_all=0.359 dir50=0.809
+ep 46 step 799 loss=0.1269 val_DEG50=0.719 val_all=0.360 dir50=0.832
+ep 48 step 833 loss=0.1243 val_DEG50=0.720 val_all=0.375 dir50=0.839
+ep 50 step 867 loss=0.3888 val_DEG50=0.725 val_all=0.378 dir50=0.824
+ep 52 step 901 loss=0.1083 val_DEG50=0.730 val_all=0.380 dir50=0.837
+ep 54 step 935 loss=0.3941 val_DEG50=0.738 val_all=0.385 dir50=0.845
+ep 56 step 969 loss=0.1430 val_DEG50=0.742 val_all=0.386 dir50=0.836
+ep 58 step1003 loss=0.3689 val_DEG50=0.740 val_all=0.387 dir50=0.837
+ep 59 step1020 loss=0.1194 val_DEG50=0.739 val_all=0.387 dir50=0.839
+best val DEG50=0.742 -> saved E:\vc_project_data\checkpoints\synthetic_unseen_drug_base_noprior.pt

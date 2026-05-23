@@ -1,0 +1,116 @@
+{
+  "unseen_drug": {
+    "B1_mean_effect": {
+      "pearson_all": 0.1537,
+      "mse": 0.0901,
+      "pearson_deg20": 0.7162,
+      "direction_acc20": 0.8904,
+      "pearson_deg50": 0.7041,
+      "direction_acc50": 0.8663,
+      "pearson_deg100": 0.6923,
+      "direction_acc100": 0.8549,
+      "alpha": null,
+      "fit_sec": 0.1
+    },
+    "B2_ridge": {
+      "pearson_all": -0.0014,
+      "mse": 0.1481,
+      "pearson_deg20": -0.1502,
+      "direction_acc20": 0.3915,
+      "pearson_deg50": -0.115,
+      "direction_acc50": 0.4236,
+      "pearson_deg100": -0.1013,
+      "direction_acc100": 0.4315,
+      "alpha": 1.0,
+      "fit_sec": 0.5
+    },
+    "B3_ridge_bio": {
+      "pearson_all": 0.2582,
+      "mse": 0.0965,
+      "pearson_deg20": 0.7096,
+      "direction_acc20": 0.8855,
+      "pearson_deg50": 0.6937,
+      "direction_acc50": 0.8627,
+      "pearson_deg100": 0.6804,
+      "direction_acc100": 0.8565,
+      "alpha": 1.0,
+      "fit_sec": 0.5
+    }
+  },
+  "unseen_cell_line": {
+    "B1_mean_effect": {
+      "pearson_all": 0.8334,
+      "mse": 0.0449,
+      "pearson_deg20": 0.9919,
+      "direction_acc20": 1.0,
+      "pearson_deg50": 0.9882,
+      "direction_acc50": 1.0,
+      "pearson_deg100": 0.9871,
+      "direction_acc100": 1.0,
+      "alpha": null,
+      "fit_sec": 0.1
+    },
+    "B2_ridge": {
+      "pearson_all": 0.8323,
+      "mse": 0.0448,
+      "pearson_deg20": 0.9918,
+      "direction_acc20": 1.0,
+      "pearson_deg50": 0.9881,
+      "direction_acc50": 1.0,
+      "pearson_deg100": 0.987,
+      "direction_acc100": 1.0,
+      "alpha": 1.0,
+      "fit_sec": 0.5
+    },
+    "B3_ridge_bio": {
+      "pearson_all": 0.831,
+      "mse": 0.0446,
+      "pearson_deg20": 0.9919,
+      "direction_acc20": 1.0,
+      "pearson_deg50": 0.9881,
+      "direction_acc50": 1.0,
+      "pearson_deg100": 0.9871,
+      "direction_acc100": 1.0,
+      "alpha": 1.0,
+      "fit_sec": 0.6
+    }
+  },
+  "unseen_both": {
+    "B1_mean_effect": {
+      "pearson_all": 0.1579,
+      "mse": 0.0904,
+      "pearson_deg20": 0.7072,
+      "direction_acc20": 0.8785,
+      "pearson_deg50": 0.6953,
+      "direction_acc50": 0.8585,
+      "pearson_deg100": 0.6834,
+      "direction_acc100": 0.8444,
+      "alpha": null,
+      "fit_sec": 0.0
+    },
+    "B2_ridge": {
+      "pearson_all": -0.0031,
+      "mse": 0.1479,
+      "pearson_deg20": -0.1946,
+      "direction_acc20": 0.3539,
+      "pearson_deg50": -0.1624,
+      "direction_acc50": 0.3863,
+      "pearson_deg100": -0.149,
+      "direction_acc100": 0.3954,
+      "alpha": 1.0,
+      "fit_sec": 0.4
+    },
+    "B3_ridge_bio": {
+      "pearson_all": 0.2705,
+      "mse": 0.0948,
+      "pearson_deg20": 0.7128,
+      "direction_acc20": 0.8645,
+      "pearson_deg50": 0.6983,
+      "direction_acc50": 0.8472,
+      "pearson_deg100": 0.6849,
+      "direction_acc100": 0.84,
+      "alpha": 1.0,
+      "fit_sec": 0.4
+    }
+  }
+}

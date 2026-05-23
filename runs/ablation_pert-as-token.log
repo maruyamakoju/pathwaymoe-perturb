@@ -1,0 +1,36 @@
+=== synthetic_unseen_drug_base_perttoken on cuda ===
+split unseen_drug: train=1026 val=114 test=270
+params=22,856,273 d=256 L=4 E=20 grn=True moe=True
+optimizer: torch.AdamW
+ep  0 step  17 loss=0.2423 val_DEG50=0.038 val_all=0.004 dir50=0.495
+ep  2 step  51 loss=0.6704 val_DEG50=0.225 val_all=0.043 dir50=0.589
+ep  4 step  85 loss=0.3657 val_DEG50=0.470 val_all=0.120 dir50=0.722
+ep  6 step 119 loss=0.2853 val_DEG50=0.555 val_all=0.141 dir50=0.770
+ep  8 step 153 loss=0.7648 val_DEG50=0.573 val_all=0.163 dir50=0.769
+ep 10 step 187 loss=0.5921 val_DEG50=0.525 val_all=0.180 dir50=0.720
+ep 12 step 221 loss=0.2169 val_DEG50=0.596 val_all=0.223 dir50=0.803
+ep 14 step 255 loss=0.1937 val_DEG50=0.561 val_all=0.236 dir50=0.779
+ep 16 step 289 loss=0.1558 val_DEG50=0.633 val_all=0.287 dir50=0.813
+ep 18 step 323 loss=0.1468 val_DEG50=0.683 val_all=0.294 dir50=0.834
+ep 20 step 357 loss=0.3875 val_DEG50=0.725 val_all=0.334 dir50=0.841
+ep 22 step 391 loss=0.1470 val_DEG50=0.750 val_all=0.363 dir50=0.866
+ep 24 step 425 loss=0.2918 val_DEG50=0.776 val_all=0.392 dir50=0.856
+ep 26 step 459 loss=0.1404 val_DEG50=0.794 val_all=0.410 dir50=0.869
+ep 28 step 493 loss=0.3972 val_DEG50=0.795 val_all=0.405 dir50=0.883
+ep 30 step 527 loss=1.4711 val_DEG50=0.792 val_all=0.406 dir50=0.841
+ep 32 step 561 loss=0.1150 val_DEG50=0.805 val_all=0.452 dir50=0.885
+ep 34 step 595 loss=0.3319 val_DEG50=0.825 val_all=0.459 dir50=0.888
+ep 36 step 629 loss=0.1230 val_DEG50=0.832 val_all=0.484 dir50=0.899
+ep 38 step 663 loss=0.2724 val_DEG50=0.847 val_all=0.498 dir50=0.877
+ep 40 step 697 loss=0.2285 val_DEG50=0.852 val_all=0.507 dir50=0.898
+ep 42 step 731 loss=0.1158 val_DEG50=0.859 val_all=0.518 dir50=0.914
+ep 44 step 765 loss=0.1184 val_DEG50=0.863 val_all=0.523 dir50=0.922
+ep 46 step 799 loss=0.1884 val_DEG50=0.870 val_all=0.536 dir50=0.922
+ep 48 step 833 loss=0.1382 val_DEG50=0.873 val_all=0.540 dir50=0.925
+ep 50 step 867 loss=0.1157 val_DEG50=0.878 val_all=0.551 dir50=0.922
+ep 52 step 901 loss=0.1177 val_DEG50=0.879 val_all=0.556 dir50=0.927
+ep 54 step 935 loss=0.1893 val_DEG50=0.879 val_all=0.556 dir50=0.926
+ep 56 step 969 loss=0.2030 val_DEG50=0.880 val_all=0.560 dir50=0.930
+ep 58 step1003 loss=0.1807 val_DEG50=0.892 val_all=0.570 dir50=0.936
+ep 59 step1020 loss=0.1108 val_DEG50=0.896 val_all=0.573 dir50=0.940
+best val DEG50=0.896 -> saved E:\vc_project_data\checkpoints\synthetic_unseen_drug_base_perttoken.pt

@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+runs/*.jsonl
+results/*.png
+wandb/
+*.pt
+# data + checkpoints live on E:\vc_project_data (not in repo)
+data/*/processed/

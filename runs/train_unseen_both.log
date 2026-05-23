@@ -1,0 +1,46 @@
+=== synthetic_unseen_both_base on cuda ===
+split unseen_both: train=821 val=91 test=54
+params=23,908,945 d=256 L=4 E=20 grn=True moe=True
+optimizer: torch.AdamW
+ep  0 step  13 loss=0.3916 val_DEG50=0.039 val_all=0.008 dir50=0.480
+ep  2 step  39 loss=0.3921 val_DEG50=0.110 val_all=0.021 dir50=0.517
+ep  4 step  65 loss=0.4192 val_DEG50=0.294 val_all=0.076 dir50=0.670
+ep  6 step  91 loss=0.4875 val_DEG50=0.456 val_all=0.125 dir50=0.748
+ep  8 step 117 loss=0.3701 val_DEG50=0.577 val_all=0.145 dir50=0.807
+ep 10 step 143 loss=0.3954 val_DEG50=0.620 val_all=0.157 dir50=0.806
+ep 12 step 169 loss=0.4556 val_DEG50=0.599 val_all=0.177 dir50=0.754
+ep 14 step 195 loss=0.3215 val_DEG50=0.580 val_all=0.184 dir50=0.780
+ep 16 step 221 loss=0.2416 val_DEG50=0.587 val_all=0.199 dir50=0.791
+ep 18 step 247 loss=0.2759 val_DEG50=0.621 val_all=0.221 dir50=0.796
+ep 20 step 273 loss=0.2748 val_DEG50=0.641 val_all=0.230 dir50=0.790
+ep 22 step 299 loss=0.2769 val_DEG50=0.644 val_all=0.235 dir50=0.806
+ep 24 step 325 loss=0.3512 val_DEG50=0.682 val_all=0.242 dir50=0.803
+ep 26 step 351 loss=0.2526 val_DEG50=0.710 val_all=0.288 dir50=0.783
+ep 28 step 377 loss=0.2315 val_DEG50=0.748 val_all=0.317 dir50=0.822
+ep 30 step 403 loss=0.2221 val_DEG50=0.773 val_all=0.330 dir50=0.848
+ep 32 step 429 loss=0.2242 val_DEG50=0.789 val_all=0.337 dir50=0.862
+ep 34 step 455 loss=0.1849 val_DEG50=0.803 val_all=0.354 dir50=0.854
+ep 36 step 481 loss=0.2018 val_DEG50=0.811 val_all=0.360 dir50=0.875
+ep 38 step 507 loss=0.2045 val_DEG50=0.831 val_all=0.398 dir50=0.890
+ep 40 step 533 loss=0.1418 val_DEG50=0.834 val_all=0.427 dir50=0.894
+ep 42 step 559 loss=0.2015 val_DEG50=0.848 val_all=0.435 dir50=0.898
+ep 44 step 585 loss=0.1603 val_DEG50=0.844 val_all=0.434 dir50=0.909
+ep 46 step 611 loss=0.2009 val_DEG50=0.851 val_all=0.435 dir50=0.913
+ep 48 step 637 loss=0.2322 val_DEG50=0.860 val_all=0.436 dir50=0.915
+ep 50 step 663 loss=0.2310 val_DEG50=0.858 val_all=0.448 dir50=0.920
+ep 52 step 689 loss=0.1988 val_DEG50=0.866 val_all=0.460 dir50=0.908
+ep 54 step 715 loss=0.1763 val_DEG50=0.865 val_all=0.478 dir50=0.913
+ep 56 step 741 loss=0.1814 val_DEG50=0.872 val_all=0.485 dir50=0.926
+ep 58 step 767 loss=0.2014 val_DEG50=0.871 val_all=0.489 dir50=0.931
+ep 60 step 793 loss=0.1481 val_DEG50=0.872 val_all=0.495 dir50=0.934
+ep 62 step 819 loss=0.1835 val_DEG50=0.875 val_all=0.490 dir50=0.938
+ep 64 step 845 loss=0.2243 val_DEG50=0.877 val_all=0.506 dir50=0.937
+ep 66 step 871 loss=0.1616 val_DEG50=0.877 val_all=0.506 dir50=0.936
+ep 68 step 897 loss=0.1602 val_DEG50=0.880 val_all=0.516 dir50=0.937
+ep 70 step 923 loss=0.1620 val_DEG50=0.885 val_all=0.527 dir50=0.934
+ep 72 step 949 loss=0.1688 val_DEG50=0.886 val_all=0.530 dir50=0.940
+ep 74 step 975 loss=0.1716 val_DEG50=0.886 val_all=0.523 dir50=0.939
+ep 76 step1001 loss=0.1800 val_DEG50=0.887 val_all=0.529 dir50=0.942
+ep 78 step1027 loss=0.1698 val_DEG50=0.892 val_all=0.540 dir50=0.945
+ep 79 step1040 loss=0.1496 val_DEG50=0.892 val_all=0.540 dir50=0.946
+best val DEG50=0.892 -> saved E:\vc_project_data\checkpoints\synthetic_unseen_both_base.pt

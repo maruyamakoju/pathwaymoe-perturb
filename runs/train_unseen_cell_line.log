@@ -1,0 +1,46 @@
+=== synthetic_unseen_cell_line_base on cuda ===
+split unseen_cell_line: train=1016 val=112 test=282
+params=23,908,945 d=256 L=4 E=20 grn=True moe=True
+optimizer: torch.AdamW
+ep  0 step  16 loss=0.5309 val_DEG50=0.052 val_all=0.012 dir50=0.538
+ep  2 step  48 loss=0.4271 val_DEG50=0.150 val_all=0.037 dir50=0.530
+ep  4 step  80 loss=0.3472 val_DEG50=0.401 val_all=0.112 dir50=0.681
+ep  6 step 112 loss=0.3585 val_DEG50=0.501 val_all=0.148 dir50=0.764
+ep  8 step 144 loss=0.3224 val_DEG50=0.528 val_all=0.167 dir50=0.782
+ep 10 step 176 loss=0.3503 val_DEG50=0.498 val_all=0.196 dir50=0.687
+ep 12 step 208 loss=0.3679 val_DEG50=0.528 val_all=0.238 dir50=0.787
+ep 14 step 240 loss=0.3733 val_DEG50=0.571 val_all=0.257 dir50=0.776
+ep 16 step 272 loss=0.3059 val_DEG50=0.604 val_all=0.280 dir50=0.784
+ep 18 step 304 loss=0.3117 val_DEG50=0.657 val_all=0.294 dir50=0.808
+ep 20 step 336 loss=0.2718 val_DEG50=0.677 val_all=0.329 dir50=0.821
+ep 22 step 368 loss=0.2270 val_DEG50=0.687 val_all=0.345 dir50=0.822
+ep 24 step 400 loss=0.2455 val_DEG50=0.699 val_all=0.346 dir50=0.836
+ep 26 step 432 loss=0.2403 val_DEG50=0.742 val_all=0.352 dir50=0.865
+ep 28 step 464 loss=0.2507 val_DEG50=0.768 val_all=0.390 dir50=0.869
+ep 30 step 496 loss=0.1433 val_DEG50=0.802 val_all=0.417 dir50=0.887
+ep 32 step 528 loss=0.2214 val_DEG50=0.805 val_all=0.434 dir50=0.882
+ep 34 step 560 loss=0.2445 val_DEG50=0.817 val_all=0.429 dir50=0.898
+ep 36 step 592 loss=0.1683 val_DEG50=0.821 val_all=0.448 dir50=0.900
+ep 38 step 624 loss=0.1857 val_DEG50=0.831 val_all=0.451 dir50=0.894
+ep 40 step 656 loss=0.2513 val_DEG50=0.836 val_all=0.462 dir50=0.905
+ep 42 step 688 loss=0.1899 val_DEG50=0.846 val_all=0.470 dir50=0.916
+ep 44 step 720 loss=0.2075 val_DEG50=0.845 val_all=0.469 dir50=0.905
+ep 46 step 752 loss=0.1565 val_DEG50=0.848 val_all=0.472 dir50=0.908
+ep 48 step 784 loss=0.1985 val_DEG50=0.847 val_all=0.473 dir50=0.908
+ep 50 step 816 loss=0.1542 val_DEG50=0.849 val_all=0.497 dir50=0.921
+ep 52 step 848 loss=0.2301 val_DEG50=0.854 val_all=0.507 dir50=0.917
+ep 54 step 880 loss=0.1632 val_DEG50=0.862 val_all=0.515 dir50=0.927
+ep 56 step 912 loss=0.2051 val_DEG50=0.869 val_all=0.516 dir50=0.927
+ep 58 step 944 loss=0.1801 val_DEG50=0.874 val_all=0.538 dir50=0.940
+ep 60 step 976 loss=0.1885 val_DEG50=0.879 val_all=0.542 dir50=0.934
+ep 62 step1008 loss=0.1488 val_DEG50=0.882 val_all=0.547 dir50=0.938
+ep 64 step1040 loss=0.1390 val_DEG50=0.884 val_all=0.545 dir50=0.939
+ep 66 step1072 loss=0.1865 val_DEG50=0.888 val_all=0.553 dir50=0.942
+ep 68 step1104 loss=0.1436 val_DEG50=0.892 val_all=0.563 dir50=0.944
+ep 70 step1136 loss=0.1441 val_DEG50=0.899 val_all=0.568 dir50=0.942
+ep 72 step1168 loss=0.1433 val_DEG50=0.904 val_all=0.579 dir50=0.949
+ep 74 step1200 loss=0.1489 val_DEG50=0.907 val_all=0.580 dir50=0.947
+ep 76 step1232 loss=0.1367 val_DEG50=0.911 val_all=0.581 dir50=0.950
+ep 78 step1264 loss=0.1378 val_DEG50=0.913 val_all=0.584 dir50=0.952
+ep 79 step1280 loss=0.1552 val_DEG50=0.915 val_all=0.585 dir50=0.953
+best val DEG50=0.915 -> saved E:\vc_project_data\checkpoints\synthetic_unseen_cell_line_base.pt

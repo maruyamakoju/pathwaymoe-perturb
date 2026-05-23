@@ -1,0 +1,17 @@
+6 shards, vocab=62713 genes
+accumulated 169220 cells x 62713 genes; cell_lines=50 drugs=242 controls=2261
+C:\Users\07013\Desktop\0522rd4\.venv\Lib\site-packages\anndata\_core\aligned_df.py:67: ImplicitModificationWarning: Transforming to str index.
+  warnings.warn("Transforming to str index.", ImplicitModificationWarning)
+seurat_v3 unavailable (ImportError); top-normalized-variance HVG fallback
+C:\Users\07013\Desktop\0522rd4\.venv\Lib\site-packages\scanpy\preprocessing\_simple.py:385: RuntimeWarning: invalid value encountered in log1p
+  np.log1p(X, out=X)
+WARNING: adata.X seems to be already log-transformed.
+  CVCL_0028: only 19 controls, skipping
+  CVCL_1125: only 11 controls, skipping
+  CVCL_1531: only 3 controls, skipping
+  CVCL_1571: only 0 controls, skipping
+  CVCL_1577: only 2 controls, skipping
+  CVCL_1715: only 1 controls, skipping
+  CVCL_1716: only 10 controls, skipping
+wrote 2879 conditions, 2000 genes -> E:\vc_project_data\data\tahoe\processed
+NOTE: target_gene blank; map drug->target separately for B3/model target features.
