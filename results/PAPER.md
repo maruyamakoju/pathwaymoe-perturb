@@ -92,7 +92,7 @@ DEG-Pearson@50 with **cluster-bootstrap** 95% CIs (resampling drugs). 3 seeds pe
 | MoE / GRN = none | 0.630 | [0.552, 0.701] |
 | MoE / GRN = random | 0.623 | [0.539, 0.696] |
 | MoE / GRN = TRRUST | 0.627 | [0.545, 0.699] |
-| MoE / GRN = TRRUST weighted | 0.632 | [0.555, 0.701] |
+| MoE / GRN = TRRUST weighted | 0.629 | [0.547, 0.700] |
 | MoE / GRN = co-expr (train-only) | 0.626 | [0.543, 0.698] |
 | MoE / GRN = co-response/LFC (train-only) | 0.625 | [0.544, 0.698] |
 
