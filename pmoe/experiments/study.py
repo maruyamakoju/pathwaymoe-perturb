@@ -40,11 +40,12 @@ def ensure_static_priors(dataset):
             load_grn(dataset, v)
         except Exception:
             build_grn(dataset, v)
-    # ground_truth only if a base grn_mask exists (synthetic)
-    from pmoe.config import priors_dir
+    # ground_truth only if a base grn_mask exists (synthetic). Check the FILE (load_grn returns
+    # None for a missing file rather than raising, so a try/except would silently skip the build).
+    from pmoe.config import priors_dir, grn_filename
     if (priors_dir(dataset) / "grn_mask.npz").exists():
-        try: load_grn(dataset, GRNVariant.GROUND_TRUTH)
-        except Exception: build_grn(dataset, GRNVariant.GROUND_TRUTH)
+        if not (priors_dir(dataset) / grn_filename(GRNVariant.GROUND_TRUTH)).exists():
+            build_grn(dataset, GRNVariant.GROUND_TRUTH)
 
 
 def build_split_grns(dataset, df, split, train_idx, variants):

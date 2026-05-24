@@ -23,7 +23,7 @@ import torch
 import torch.nn as nn
 
 from pmoe.config import ModelConfig
-from pmoe.models.layers import CrossAttention, MixedAttention, MoEFFN
+from pmoe.models.layers import CrossAttention, GRNPropagation, MixedAttention, MoEFFN
 
 
 def _densify(a):
@@ -103,6 +103,13 @@ class PathwayMoEPerturb(nn.Module):
             self.register_buffer("grn_bias", torch.from_numpy(bias), persistent=False)
         else:
             self.grn_bias = None
+
+        # SOFT GRN message-passing (orthogonal to the mask above). The GRNPropagation module
+        # owns its own non-persistent P buffer (rebuilt at load). Same grn as the mask.
+        if cfg.grn_propagation and grn is not None:
+            self.grn_prop = GRNPropagation(cfg, grn)
+        else:
+            self.grn_prop = None
 
         # pathway prior over experts (N, E): map pathway membership to experts (1:1 truncated)
         if gene_pathway is not None and cfg.use_pathway_prior:
@@ -186,6 +193,8 @@ class PathwayMoEPerturb(nn.Module):
             else:
                 tok, aux = layer(tok, ctx, self.grn_bias, self.pathway_prior)
             aux_total = aux_total + aux
+        if self.grn_prop is not None:                             # soft GRN message-passing (residual)
+            tok = self.grn_prop(tok)
         pred = self.head(self.head_ln(tok)).squeeze(-1)           # (B,N)
         self._last_aux = aux_total / max(1, self.cfg.n_layers)
         return pred

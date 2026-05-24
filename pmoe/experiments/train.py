@@ -35,23 +35,29 @@ def _eval(model, loader, device):
     return compute_metrics(np.concatenate(P), np.concatenate(T), np.concatenate(D))
 
 
-def make_model_config(dataset, size, variant, n_genes, n_experts, cb_dim) -> ModelConfig:
+def make_model_config(dataset, size, variant, n_genes, n_experts, cb_dim,
+                      grn_propagation: bool = False,
+                      use_grn_mask: bool | None = None) -> ModelConfig:
     preset = SIZE_PRESETS[size]
     v = GRNVariant(variant)
+    mask = (v != GRNVariant.NONE) if use_grn_mask is None else use_grn_mask
     return ModelConfig(n_genes=n_genes, n_experts=n_experts, chemberta_dim=cb_dim,
-                       use_grn_mask=(v != GRNVariant.NONE),
-                       weighted_grn=(v == GRNVariant.TRRUST_WEIGHTED), **preset)
+                       use_grn_mask=mask,
+                       weighted_grn=(v == GRNVariant.TRRUST_WEIGHTED),
+                       grn_propagation=grn_propagation, **preset)
 
 
 def train(dataset: str, split: str, variant: str = "none", seed: int = SEED,
-          tc: TrainConfig | None = None, size: str = "base", verbose: bool = True) -> dict:
+          tc: TrainConfig | None = None, size: str = "base", verbose: bool = True,
+          grn_propagation: bool = False, use_grn_mask: bool | None = None,
+          tag: str = "") -> dict:
     tc = tc or TrainConfig(seed=seed)
     tc.seed = seed
     if tc.deterministic:
         torch.manual_seed(seed); np.random.seed(seed)
         torch.backends.cudnn.deterministic = True; torch.backends.cudnn.benchmark = False
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    run = RunSpec(dataset=dataset, split=split, variant=variant, seed=seed, size=size)
+    run = RunSpec(dataset=dataset, split=split, variant=variant, seed=seed, size=size, tag=tag)
 
     df = load_conditions(dataset); genes = load_genes(dataset)
     shared = build_shared(dataset, df)
@@ -59,13 +65,19 @@ def train(dataset: str, split: str, variant: str = "none", seed: int = SEED,
     gp, _ = load_pathways(dataset)
     n_experts = gp.shape[1]
     grn = None if GRNVariant(variant) == GRNVariant.NONE else load_grn(dataset, variant, split)
+    # fail loudly: a non-"none" variant MUST have a GRN, else we'd silently train without one
+    # (this exact silent failure invalidated an earlier ground_truth positive control).
+    if GRNVariant(variant) != GRNVariant.NONE and grn is None:
+        raise RuntimeError(f"GRN for variant '{variant}' (split={split}) not found in priors — "
+                           f"build it first (build_grn). Refusing to train silently without a GRN.")
 
     sp_ = make_splits(df, split, seed=SEED)            # FIXED split seed across model seeds
     tr, va = sp_["train"], sp_["val"]
     tl = make_loader(dataset, tr, df, shared, tc.batch_size, shuffle=True)
     vl = make_loader(dataset, va, df, shared, tc.batch_size, shuffle=False)
 
-    cfg = make_model_config(dataset, size, variant, n_genes, n_experts, cb_dim)
+    cfg = make_model_config(dataset, size, variant, n_genes, n_experts, cb_dim,
+                            grn_propagation=grn_propagation, use_grn_mask=use_grn_mask)
     model = PathwayMoEPerturb(cfg, grn, gp).to(device); model.grad_checkpoint = tc.grad_ckpt
     if verbose:
         print(f"=== {run.name} === params={count_params(model):,} variant={variant} "

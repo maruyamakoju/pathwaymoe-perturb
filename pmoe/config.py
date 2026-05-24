@@ -93,6 +93,8 @@ class ModelConfig:
     use_pathway_prior: bool = True
     pert_as_token: bool = False
     weighted_grn: bool = False     # if True, attention bias uses edge weights (not just allow/deny)
+    grn_propagation: bool = False  # if True, apply SOFT GRN message-passing (orthogonal to mask)
+    grn_prop_hops: int = 2         # number of propagation hops (P^1..P^k) when grn_propagation=True
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -122,10 +124,13 @@ class RunSpec:
     variant: str = "none"
     seed: int = SEED
     size: str = "base"
+    tag: str = ""              # optional mechanism tag (e.g. "proponly"); keeps names distinct
 
     @property
     def name(self) -> str:
         parts = [self.dataset, self.split, self.size, self.variant]
+        if self.tag:
+            parts.append(self.tag)
         if self.seed != SEED:
             parts.append(f"s{self.seed}")
         return "__".join(parts)

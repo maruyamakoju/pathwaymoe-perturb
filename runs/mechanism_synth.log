@@ -1,0 +1,6 @@
+[skip] synthetic_hard_big__unseen_drug__base__none
+[skip] synthetic_hard_big__unseen_drug__base__none__s1
+[skip] synthetic_hard_big__unseen_drug__base__none__s2
+[train] gt_mask: synthetic_hard_big__unseen_drug__base__ground_truth
+=== synthetic_hard_big__unseen_drug__base__ground_truth === params=23,908,945 variant=ground_truth grn_edges=4530 device=cuda
+  ep  0 val_DEG50=0.021 val_all=0.004

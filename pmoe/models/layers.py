@@ -11,11 +11,79 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
+import scipy.sparse as sp
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from pmoe.config import ModelConfig
+
+
+class GRNPropagation(nn.Module):
+    r"""SOFT GRN message-passing (GNN-style feature propagation) over the gene/N axis.
+
+    This is an alternative to the hard GRN attention *mask*: instead of restricting which
+    genes a head may attend to, we propagate gene-token features along GRN edges with a
+    fixed, row-normalized propagation operator and learnable per-hop strengths. It is fully
+    orthogonal to :class:`MixedAttention`'s mask (both can be on or off).
+
+    Building the propagation operator ``P`` from a (weighted-or-binary) adjacency ``A``
+    (shape ``N x N``, scipy-sparse or dense):
+
+      1. ``M = |A|``                                   (drop edge sign; magnitude only)
+      2. ``M = max(M, M^T)``                           (symmetrize by strongest direction)
+      3. ``M[i, i] = 0``                               (zero the diagonal)
+      4. row-normalize: ``P[i, j] = M[i, j] / sum_j M[i, j]`` for rows with at least one
+         edge; a row with no outgoing edges is left all-zero (``P[i, :] = 0``), i.e. that
+         gene receives no propagated message (the residual still carries its own features).
+
+    ``P`` is stored as a **non-persistent** dense ``(N, N)`` float buffer (N <= ~2000, so a
+    dense matrix is fine) and is rebuilt from the GRN at load time.
+
+    Forward (``h`` is ``(B, N, d)``)::
+
+        H_out = LayerNorm( h + sum_{k=1..hops} alpha_k * (P^k h) )
+
+    where ``P^k h`` propagates the gene features ``k`` hops along the (symmetrized,
+    row-normalized) GRN, computed by iterated matmul over the N axis
+    (``einsum('ij,bjd->bid', P, .)``), and ``alpha_k`` are LEARNABLE per-hop scalars
+    (``nn.Parameter``) initialized small (~0.1) so the layer starts near the identity
+    (``H_out ~= LayerNorm(h)``).
+    """
+
+    def __init__(self, cfg: ModelConfig, grn):
+        super().__init__()
+        self.cfg = cfg
+        self.hops = int(cfg.grn_prop_hops)
+
+        P = self._build_prop(grn)                                  # (N, N) float32
+        self.register_buffer("P", torch.from_numpy(P), persistent=False)
+        # learnable per-hop strengths, init small so the layer starts near identity
+        self.alpha = nn.Parameter(torch.full((self.hops,), 0.1))
+        self.norm = nn.LayerNorm(cfg.d_model)
+
+    @staticmethod
+    def _build_prop(grn) -> np.ndarray:
+        """Row-normalized propagation operator P from |A| (symmetrized, zero-diagonal)."""
+        if sp.issparse(grn):
+            grn = grn.toarray()
+        A = np.abs(np.asarray(grn, dtype=np.float32))
+        A = np.maximum(A, A.T)                                     # symmetrize
+        np.fill_diagonal(A, 0.0)                                   # zero diagonal
+        row = A.sum(axis=1, keepdims=True)                         # (N, 1)
+        # rows with no edges stay all-zero (avoid div-by-zero); others sum to 1
+        P = np.divide(A, row, out=np.zeros_like(A), where=row > 0)
+        return P.astype(np.float32)
+
+    def forward(self, h: torch.Tensor) -> torch.Tensor:
+        # h: (B, N, d). Iterated propagation over the gene/N axis.
+        out = h
+        hk = h
+        for k in range(self.hops):
+            hk = torch.einsum("ij,bjd->bid", self.P, hk)           # P^(k+1) h
+            out = out + self.alpha[k] * hk
+        return self.norm(out)
 
 
 class MoEFFN(nn.Module):

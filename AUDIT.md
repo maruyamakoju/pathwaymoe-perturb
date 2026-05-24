@@ -60,6 +60,19 @@ library versions + data manifest (803 shard ids, hashes) into each result file.
 - Tests = one smoke script. → pytest unit + integration suite, including a **leakage regression test**
   (assert no test-condition info enters any GRN/HVG).
 
+## J. CRITICAL (found during extension) — silent "GRN missing → train without GRN"
+`load_grn` returns `None` for a missing file (not raise), and `ensure_static_priors` guarded the
+build with `try: load_grn(v) except: build_grn(v)` — so a missing GRN file silently skipped the build,
+and `train()` then trained with `grn=None` (dense attention) while the checkpoint still recorded
+`use_grn_mask=True`. This invalidated the `ground_truth` runs on `synthetic_hard`/`synthetic_hard_big`
+(no `grn_ground_truth.npz` existed) and the `trrust_weighted` row on `tahoe_full` — all silently ran
+*without* a GRN (≡ none). The real-Tahoe random/trrust/coexpr/coexpr_lfc rows were unaffected (their
+files existed from v1), so the **headline null stands**, but the positive control had to be redone.
+**Fix:** (1) `train()` now RAISES if a non-`none` variant's GRN is absent (loud failure); (2)
+`ensure_static_priors` builds ground_truth by FILE-existence check, not by catching a (non-raising)
+load. Lesson: a loader that returns `None` on missing input is a silent-failure trap — prefer raising,
+and assert prerequisites at the point of use.
+
 ## What "3 levels up" means here
 1. **Correctness:** A, B (no leakage) — without this the study is not publishable.
 2. **Rigor:** C, D, E, F, G — cluster CIs, corrections, a GRN-only baseline, weighted GRN, effect sizes.
