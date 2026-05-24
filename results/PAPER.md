@@ -17,12 +17,15 @@ with vs. held out from training). **Result:** with leakage-free GRNs and cluster
 **no GRN prior — generic, weighted, or data-derived — significantly improves real-data OOD prediction**
 (all |Δ DEG-Pearson|≤0.007, Holm-p>0.1), although the deep model beats linear baselines. On synthetic
 data we localize why: when test perturbations **share targets** with training, even the *true* GRN is
-redundant (the model learns the response directly); when targets are **novel**, the task is
-near-unpredictable and even the **ground-truth GRN at full statistical power** (39 clusters) gives no
-significant benefit (Δ=−0.003, p=0.86). We conclude that injecting a static, binary GRN as an
-attention mask is not an effective inductive bias for this task — the structure it encodes is either
-redundant (shared targets) or insufficient (novel targets) for OOD perturbation prediction. We release
-a typed, tested, leakage-audited benchmarking package (`pmoe/`).
+redundant (the model learns the response directly, true GRN +0.014, ns); when targets are **novel**,
+the true GRN gives a meaningful but **non-significant** gain (Δ≈+0.06, p≈0.80) in a regime that is
+near-unpredictable, and the **injection mechanism** (hard attention mask vs soft message-passing) does
+not matter. We conclude that a structured GRN prior is not an effective inductive bias for OOD
+perturbation prediction where prediction is feasible (shared targets, incl. Tahoe) — it is redundant
+there — and only *hints* at helping for novel targets, where prediction is anyway near-impossible. En
+route we caught and fixed three result-invalidating bugs (test-set GRN leakage; a silent
+"train-without-GRN" fallback; bf16 metric nondeterminism), underscoring the audit. We release a typed,
+tested, leakage-audited benchmarking package (`pmoe/`).
 
 ## 1. Introduction
 
@@ -111,31 +114,38 @@ Synthetic data whose generative process *is* GRN propagation, where drug classes
 | random | 0.595 | −0.001 (1.0) |
 | co-expr (train-only) | 0.593 | −0.003 (1.0) |
 | co-response/LFC (train-only) | 0.594 | −0.002 (1.0) |
-| **ground_truth (true GRN)** | **0.610** | **+0.014 (0.34)** |
+| **ground_truth (true GRN)** | **0.610** | **+0.014 (p=0.069)** |
 
 Even the **true** generative GRN gives only +0.014 (not significant). When test perturbations hit
 targets already seen in training, a flexible model learns the response directly — the GRN mask is
 **redundant**. (B3 ridge 0.631 is the strongest model here; the MoE neither needs nor benefits from
 the GRN.)
 
-### 3.3 Synthetic, novel-target regime — the boundary condition (positive control)
+### 3.3 Synthetic, novel-target regime — the boundary condition + mechanism test
 Each drug hits a **distinct** target TF, so holding out a drug holds out its target's direct effect:
-predicting it *requires* propagating along the GRN from a novel target. This is where the GRN should
-matter most, and the positive control that the measurement is *sensitive*.
+predicting it *requires* propagating along the GRN from a novel target. Well-powered (192 drugs, 39
+clusters — same power as real data); deterministic fp32 eval; cluster CIs, 3 seeds. We also compare
+GRN-injection *mechanisms*: hard attention mask vs soft GNN message-passing vs both.
 
-- **Low-power (9 clusters):** ground_truth vs none Δ=+0.019 (**p<0.001, significant**) — the method
-  *does* detect a GRN benefit when one exists — but random vs none Δ=+0.022 (p=0.10), i.e. of similar
-  magnitude, and absolute DEG-Pearson is near zero for all models (novel-target extrapolation is
-  near-impossible). The benefit is weak and **non-specific** (any sparse mask ≈ true GRN).
-- **Well-powered (192 drugs, 39 clusters — same power as real data):** all models near zero
-  (none 0.024, random 0.019, ground_truth 0.021); **ground_truth vs none Δ=−0.003 (Holm-p=0.86)**,
-  random vs none Δ=−0.005 (p=0.86) — **no significant benefit**. The +0.019 "significance" at 9
-  clusters was a low-power artifact that vanishes under proper powering. Held-out *unique* targets are
-  essentially unpredictable (DEG-Pearson ≈ 0) and the true GRN does not change that.
+| Model (all use the true GRN) | DEG-Pearson@50 | Δ vs none (Holm-p) |
+|---|---|---|
+| none | 0.368 [0.232, 0.510] | — |
+| GRN as attention mask | 0.432 [0.299, 0.565] | **+0.063 (0.80)** |
+| GRN as soft propagation | 0.427 [0.298, 0.557] | +0.059 (0.80) |
+| GRN as mask + propagation | 0.437 [0.307, 0.568] | +0.069 (0.80) |
 
-**Bottom line across all regimes:** the GRN attention mask never confers a significant, specific
-benefit — not on real data, not when the GRN is redundant (shared-target), and not when it should be
-essential (novel-target), even with the ground-truth GRN at full statistical power.
+Here the true GRN yields a **meaningful point-estimate gain (+0.06–0.07, all >|0.01|)** — and unlike
+the shared-target regime, the effect is positive and consistent — but it is **not statistically
+significant** (Holm-p≈0.80): held-out novel targets are intrinsically hard, so between-drug variance
+is large and the 39-cluster CIs are wide ([0.23, 0.51]). The **injection mechanism does not matter**
+(mask ≈ propagation ≈ both; mask−vs−prop Δ=−0.005), arguing against "we just used the wrong mechanism."
+So the GRN *plausibly* helps exactly where it should (novel targets) but only in a regime that is
+barely predictable; we cannot confirm it at p<0.05.
+
+**Bottom line across regimes:** where OOD prediction is *feasible* — real Tahoe and synthetic
+shared-target — a GRN prior confers **no** benefit (tight nulls; true GRN +0.014, ns). The GRN only
+*hints* at helping for **novel targets**, a near-unpredictable regime where the +0.06 gain is not
+significant. Independent of injection mechanism.
 
 ## 4. Discussion
 
@@ -145,9 +155,9 @@ GRN-structured attention mask provides **no robust, specific benefit** for OOD p
   beats no-GRN (all |Δ|≤0.007, Holm-p>0.1), even though the deep MoE beats linear baselines.
 - On **synthetic shared-target** data, even the *true* GRN is redundant: with targets seen in training,
   the model learns the perturbation response directly.
-- On **synthetic novel-target** data, where the GRN is in principle essential, the task becomes
-  near-unpredictable and even the ground-truth GRN at full power gives no significant benefit
-  (Δ=−0.003, p=0.86); held-out unique targets are essentially unpredictable.
+- On **synthetic novel-target** data, where the GRN is in principle essential, the true GRN gives a
+  meaningful but non-significant point-estimate gain (+0.06, p≈0.80) — and the injection mechanism
+  (mask vs soft message-passing) does not matter — but this regime is near-unpredictable.
 
 A likely mechanism, beyond the redundancy/insufficiency dichotomy, is **mask sparsity**: with
 500–4,500 edges over 2,000 gene tokens, GRN-masked attention heads see ~1–2 neighbours per gene and are

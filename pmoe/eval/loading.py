@@ -54,11 +54,11 @@ def predict_test(run: RunSpec, dataset: str, df, shared: dict, test_idx: np.ndar
 
     model = load_model_for_eval(run, dataset, variant, split, device)
     loader = make_loader(dataset, test_idx, df, shared, batch_size=16, shuffle=False)
-    use_cuda = str(device) == "cuda" or getattr(device, "type", None) == "cuda"
+    # fp32 (no bf16 autocast) for DETERMINISTIC, reproducible eval metrics. bf16 autocast made the
+    # point estimate run-to-run unstable on near-zero-variance tasks (per-condition DEG-Pearson ~0).
     preds = []
     with torch.no_grad():
         for batch in loader:
             b = {k: (v.to(device) if torch.is_tensor(v) else v) for k, v in batch.items()}
-            with torch.autocast("cuda", dtype=torch.bfloat16, enabled=use_cuda):
-                preds.append(model(b).float().cpu().numpy())
+            preds.append(model(b).float().cpu().numpy())
     return np.concatenate(preds)

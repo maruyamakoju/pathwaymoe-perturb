@@ -73,6 +73,18 @@ files existed from v1), so the **headline null stands**, but the positive contro
 load. Lesson: a loader that returns `None` on missing input is a silent-failure trap — prefer raising,
 and assert prerequisites at the point of use.
 
+## K. CRITICAL (found during extension) — bf16 metric nondeterminism
+`predict_test` used bf16 autocast. On well-behaved tasks (real Tahoe, DEG-Pearson ~0.62) this was
+harmless, but on the near-zero-variance novel-target synthetic task it made the **point estimate
+unstable run-to-run** (none = 0.024 / 0.350 / 0.271 across analyses of the *same* checkpoints) — and
+nearly led to the wrong conclusion ("true GRN gives no benefit") when the deterministic truth is a
+meaningful +0.06. **Fix:** eval in fp32 (no autocast). Lesson: metrics that feed conclusions must be
+computed deterministically; verify a headline number with an independent direct recompute.
+
+(Three result-invalidating bugs — A/B leakage, J silent-no-GRN, K bf16-nondeterminism — were caught
+only by cross-checking; each would have produced a confidently wrong claim. This is the case for the
+audit + tests + direct-recompute verification, i.e. the engineering rigor itself.)
+
 ## What "3 levels up" means here
 1. **Correctness:** A, B (no leakage) — without this the study is not publishable.
 2. **Rigor:** C, D, E, F, G — cluster CIs, corrections, a GRN-only baseline, weighted GRN, effect sizes.
