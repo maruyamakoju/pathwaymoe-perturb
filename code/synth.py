@@ -96,7 +96,7 @@ def _validate_drugs():
 
 
 def build(n_genes=2000, n_pathways=20, hops=3, seed=SEED, n_cells_mean=200,
-          unique_targets=False):
+          unique_targets=False, n_extra_drugs=0):
     """unique_targets=True: each drug hits a DISTINCT TF target (no shared hubs). Holding out a drug
     then holds out its target's direct effect, so predicting it REQUIRES propagating along the GRN
     from that (novel) target to known genes -> the GRN becomes essential (positive-control regime)."""
@@ -144,6 +144,11 @@ def build(n_genes=2000, n_pathways=20, hops=3, seed=SEED, n_cells_mean=200,
                            + rng.normal(0, 0.2, n_genes), 0, None)
 
     drugs = _validate_drugs()
+    if n_extra_drugs > 0:
+        # auto-generated drugs (empty SMILES -> splits fall back to drug-name clusters, giving many
+        # independent test clusters for statistical power). Chemistry is unused: target is an input.
+        for i in range(n_extra_drugs):
+            drugs.append((f"syn{i:04d}", "", PATHWAY_TAGS[i % n_pathways], -1))
     # Targets must be INFERABLE FROM CHEMISTRY for unseen-drug generalization to be possible:
     # each pathway/MoA class gets a small set of TF "hub" targets, and every drug in that class
     # hits one of its class hubs. Real drug classes (MEK inhibitors, CDK inhibitors, ...) share
@@ -240,10 +245,11 @@ def main():
     ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--dataset", default="synthetic")
     ap.add_argument("--unique-targets", action="store_true")
+    ap.add_argument("--n-extra-drugs", type=int, default=0)
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     df, genes, pw, gp, grn, dm = build(a.n_genes, a.n_pathways, seed=a.seed,
-                                       unique_targets=a.unique_targets)
+                                       unique_targets=a.unique_targets, n_extra_drugs=a.n_extra_drugs)
     print(f"[{a.dataset}] conditions={len(df)} genes={len(genes)} pathways={len(pw)} "
           f"drugs={len(dm)} grn_edges={grn.nnz} unique_targets={a.unique_targets}")
     print(f"mean |lfc|={np.abs(np.stack(df['lfc'].to_numpy())).mean():.3f} "

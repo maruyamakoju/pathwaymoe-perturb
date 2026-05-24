@@ -1,0 +1,114 @@
+{
+  "manifest": {
+    "dataset": "synthetic_hard",
+    "n_genes": 2000,
+    "n_conditions": 1410,
+    "n_cells_total": null,
+    "n_shards": null,
+    "genes_sha1": "73fd13e31c46",
+    "cell_lines": 10
+  },
+  "splits": {
+    "unseen_drug": {
+      "n_test": 270,
+      "n_clusters": 9,
+      "baselines": {
+        "B1_mean_effect": {
+          "deg50": -0.23663081496404698,
+          "ci": [
+            -0.43704565934917056,
+            -0.03956683279155824
+          ]
+        },
+        "B2_ridge": {
+          "deg50": 0.02432106325922174,
+          "ci": [
+            -0.2020043485622998,
+            0.22950603122232333
+          ]
+        },
+        "B3_ridge_bio": {
+          "deg50": 0.013947763961696462,
+          "ci": [
+            -0.21465572288684107,
+            0.225976409239138
+          ]
+        }
+      },
+      "grn_prop": {
+        "random": {
+          "deg50": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "ground_truth": {
+          "error": "array must be at least 2-d"
+        }
+      },
+      "model": {
+        "none": {
+          "deg50": -0.08037430925846517,
+          "ci": [
+            -0.27510697052032734,
+            0.10535275032034819
+          ],
+          "n_seeds": 3,
+          "seed_mean": -0.08037430925846517,
+          "seed_std": 0.038517601716265976
+        },
+        "random": {
+          "deg50": -0.05872252177860635,
+          "ci": [
+            -0.2537195461633702,
+            0.12056139119736335
+          ],
+          "n_seeds": 3,
+          "seed_mean": -0.05872252177860635,
+          "seed_std": 0.040564769479503764
+        },
+        "ground_truth": {
+          "deg50": -0.06181398190749296,
+          "ci": [
+            -0.2515359515583016,
+            0.11978276401939227
+          ],
+          "n_seeds": 3,
+          "seed_mean": -0.06181398190749295,
+          "seed_std": 0.04263388304024729
+        }
+      },
+      "contrasts": {
+        "random_vs_none": {
+          "delta": 0.02165178747985881,
+          "ci": [
+            -0.0026657360051991355,
+            0.04940858774290199
+          ],
+          "p": 0.097,
+          "p_holm": 0.097,
+          "p_corrected": 0.097,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": true,
+          "significant_and_meaningful": false
+        },
+        "ground_truth_vs_none": {
+          "delta": 0.018560327350972218,
+          "ci": [
+            0.00691883555784975,
+            0.03159374522123556
+          ],
+          "p": 0.0,
+          "p_holm": 0.0,
+          "p_corrected": 0.0,
+          "min_effect": 0.01,
+          "significant": true,
+          "meaningful": true,
+          "significant_and_meaningful": true
+        }
+      }
+    }
+  }
+}

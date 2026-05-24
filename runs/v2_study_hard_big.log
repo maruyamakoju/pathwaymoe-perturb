@@ -1,0 +1,4 @@
+Some weights of RobertaModel were not initialized from the model checkpoint at DeepChem/ChemBERTa-77M-MLM and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+=== synthetic_hard_big__unseen_drug__base__none === params=23,908,945 variant=none grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.027 val_all=0.005
