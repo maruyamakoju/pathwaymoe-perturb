@@ -95,7 +95,11 @@ def _validate_drugs():
     return good
 
 
-def build(n_genes=2000, n_pathways=20, hops=3, seed=SEED, n_cells_mean=200):
+def build(n_genes=2000, n_pathways=20, hops=3, seed=SEED, n_cells_mean=200,
+          unique_targets=False):
+    """unique_targets=True: each drug hits a DISTINCT TF target (no shared hubs). Holding out a drug
+    then holds out its target's direct effect, so predicting it REQUIRES propagating along the GRN
+    from that (novel) target to known genes -> the GRN becomes essential (positive-control regime)."""
     rng = np.random.default_rng(seed)
     n_pathways = min(n_pathways, len(PATHWAY_TAGS))
     pw_names = PATHWAY_TAGS[:n_pathways]
@@ -157,9 +161,15 @@ def build(n_genes=2000, n_pathways=20, hops=3, seed=SEED, n_cells_mean=200):
         n_hub = min(3, len(cand))
         tag_hubs[tag] = rng.choice(cand, size=max(1, n_hub), replace=False).tolist()
     drug_target = {}
-    for i, (name, smi, tag, sign) in enumerate(drugs):
-        hubs = tag_hubs[tag]
-        drug_target[name] = int(hubs[i % len(hubs)])
+    if unique_targets:
+        # each drug -> a DISTINCT TF target (novel-target regime; GRN essential for unseen drugs)
+        pool = rng.permutation(tfs)
+        for i, (name, smi, tag, sign) in enumerate(drugs):
+            drug_target[name] = int(pool[i % len(pool)])
+    else:
+        for i, (name, smi, tag, sign) in enumerate(drugs):
+            hubs = tag_hubs[tag]
+            drug_target[name] = int(hubs[i % len(hubs)])
 
     # propagation operator: sum_{h=0}^{H} (decay*A)^h applied to initial delta
     decay = 0.7
@@ -228,16 +238,19 @@ def main():
     ap.add_argument("--n-genes", type=int, default=2000)
     ap.add_argument("--n-pathways", type=int, default=20)
     ap.add_argument("--seed", type=int, default=SEED)
+    ap.add_argument("--dataset", default="synthetic")
+    ap.add_argument("--unique-targets", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
-    df, genes, pw, gp, grn, dm = build(a.n_genes, a.n_pathways, seed=a.seed)
-    print(f"conditions={len(df)} genes={len(genes)} pathways={len(pw)} "
-          f"drugs={len(dm)} grn_edges={grn.nnz}")
+    df, genes, pw, gp, grn, dm = build(a.n_genes, a.n_pathways, seed=a.seed,
+                                       unique_targets=a.unique_targets)
+    print(f"[{a.dataset}] conditions={len(df)} genes={len(genes)} pathways={len(pw)} "
+          f"drugs={len(dm)} grn_edges={grn.nnz} unique_targets={a.unique_targets}")
     print(f"mean |lfc|={np.abs(np.stack(df['lfc'].to_numpy())).mean():.3f} "
           f"mean DEGs/cond={np.stack(df['deg_mask'].to_numpy()).sum(1).mean():.1f}")
     if a.dry_run:
         print("[dry-run] not writing"); return
-    out, pri = write(df, genes, pw, gp, grn, dm)
+    out, pri = write(df, genes, pw, gp, grn, dm, dataset=a.dataset)
     print(f"wrote {out}\n      {pri}")
 
 

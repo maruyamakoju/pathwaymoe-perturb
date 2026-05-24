@@ -73,17 +73,27 @@ We report the number of test clusters per split as the true effective sample siz
 [From earlier run: full model beats baselines on OOD; GRN-mask ablation −0.080 — the ground-truth GRN
 is the dominant useful component. To re-run as the `ground_truth` end of the spectrum.]
 
-### 3.2 Real Tahoe-100M — GRN-quality spectrum
-[Table + figure from `study_tahoe_full.json`: DEG-Pearson@50 per variant with CIs, paired p-values
-trrust_vs_none, coexpr_lfc_vs_none, coexpr_lfc_vs_trrust, coexpr_lfc_vs_random.]
+### 3.2 Real Tahoe-100M — GRN-quality spectrum (PRIMARY RESULT)
+22.66M cells, 8,875 conditions; unseen_drug test = 1,707 conditions across **39 drug clusters**.
+DEG-Pearson@50 with **cluster-bootstrap** 95% CIs (resampling drugs). 3 seeds per variant.
 
-| GRN variant | DEG-Pearson@50 (95% CI) | Δ vs none | p |
-|---|---|---|---|
-| none | … | — | — |
-| random | … | … | … |
-| trrust (generic) | … | … | … |
-| coexpr (observational) | … | … | … |
-| coexpr_lfc (co-response) | … | … | … |
+| Model | DEG-Pearson@50 | 95% CI (cluster) |
+|---|---|---|
+| baseline B1 mean-effect | 0.608 | [0.546, 0.664] |
+| baseline B2/B3 ridge | 0.582 | [0.507, 0.646] |
+| MoE / GRN = none | 0.630 | [0.552, 0.701] |
+| MoE / GRN = random | 0.623 | [0.539, 0.696] |
+| MoE / GRN = TRRUST | 0.627 | [0.545, 0.699] |
+| MoE / GRN = TRRUST weighted | 0.632 | [0.555, 0.701] |
+| MoE / GRN = co-expr (train-only) | 0.626 | [0.543, 0.698] |
+| MoE / GRN = co-response/LFC (train-only) | 0.625 | [0.544, 0.698] |
+
+Planned contrasts (paired cluster bootstrap, Holm-corrected): **every** GRN variant vs none is within
+±0.007 with Holm-p > 0.1 — none significant, none meaningful (|Δ|≥0.01). Notably the data-derived
+co-response GRN — the variant a leaky analysis would have favoured — is Δ = **−0.005 (p=0.52)** vs none
+and −0.003 (p=0.74) vs TRRUST. The deep MoE (~0.63) beats the linear baselines (0.58–0.61), but the
+**GRN attention mask contributes nothing measurable, at any quality level**.
+(GRN-propagation baseline: N/A here — Tahoe lacks per-row drug→target labels to seed it.)
 
 ## 4. Discussion
 
