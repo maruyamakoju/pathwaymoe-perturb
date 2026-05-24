@@ -25,8 +25,9 @@ def table(study) -> str:
             if k in s.get("model", {}):
                 v = s["model"][k]; lines.append(f"| **MoE / GRN={k}** | **{v['deg50']:.3f}** | [{v['ci'][0]:.3f}, {v['ci'][1]:.3f}] |")
         for k in VORDER:
-            if k in s.get("grn_prop", {}) and "deg50" in s["grn_prop"][k]:
-                v = s["grn_prop"][k]; lines.append(f"| GRN-prop / GRN={k} | {v['deg50']:.3f} | [{v['ci'][0]:.3f}, {v['ci'][1]:.3f}] |")
+            v = s.get("grn_prop", {}).get(k)
+            if v and "deg50" in v and v["deg50"] > 1e-6:   # skip N/A (no drug->target labels)
+                lines.append(f"| GRN-prop / GRN={k} | {v['deg50']:.3f} | [{v['ci'][0]:.3f}, {v['ci'][1]:.3f}] |")
         lines += ["\n**Contrasts (paired cluster bootstrap, Holm-corrected):**\n",
                   "| contrast | Δ DEG-Pearson | 95% CI | p (Holm) | significant&meaningful |",
                   "|---|---|---|---|---|"]
@@ -48,7 +49,7 @@ def figure(study, dataset):
         err = np.array([np.array(means) - lo, np.array(hi) - means])
         ax.errorbar(x, means, yerr=err, fmt="o", ms=9, capsize=4, lw=2, color="#2c7fb8", label="PathwayMoE")
         # GRN-prop baseline overlaid
-        gv = [v for v in vs if v in s.get("grn_prop", {}) and "deg50" in s["grn_prop"][v]]
+        gv = [v for v in vs if s.get("grn_prop", {}).get(v, {}).get("deg50", 0) > 1e-6]
         if gv:
             gx = [vs.index(v) for v in gv]; gm = [s["grn_prop"][v]["deg50"] for v in gv]
             ax.scatter(gx, gm, marker="s", color="#7570b3", s=40, label="GRN-prop (GRN-only)", zorder=3)

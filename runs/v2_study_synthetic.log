@@ -1,0 +1,4 @@
+=== synthetic__unseen_drug__base__none === params=23,908,945 variant=none grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.042 val_all=0.007
+  ep  2 val_DEG50=0.179 val_all=0.033
+  ep  4 val_DEG50=0.419 val_all=0.107

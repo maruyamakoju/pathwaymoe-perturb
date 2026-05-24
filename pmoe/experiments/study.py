@@ -103,7 +103,9 @@ def analyze(dataset, splits, variants, seeds, size="base"):
                 res["baselines"][getattr(Bl, "name", str(Bl))] = {"error": str(e)[:120]}
 
         # GRN-propagation baseline across variants (does a GRN-only model benefit from GRN quality?)
-        for variant in variants:
+        # Requires drug->target labels to seed propagation; skip if absent (e.g. real Tahoe subset).
+        has_targets = df["target_gene"].fillna("").astype(bool).any()
+        for variant in (variants if has_targets else []):
             if GRNVariant(variant) == GRNVariant.NONE:
                 continue
             try:

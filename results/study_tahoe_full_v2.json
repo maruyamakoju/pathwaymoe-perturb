@@ -1,0 +1,249 @@
+{
+  "manifest": {
+    "dataset": "tahoe_full",
+    "n_genes": 2000,
+    "n_conditions": 8875,
+    "n_cells_total": 22664673,
+    "n_shards": 803,
+    "genes_sha1": "034932db76c4",
+    "cell_lines": 50
+  },
+  "splits": {
+    "unseen_drug": {
+      "n_test": 1707,
+      "n_clusters": 39,
+      "baselines": {
+        "B1_mean_effect": {
+          "deg50": 0.6083624813141907,
+          "ci": [
+            0.5463278245783293,
+            0.6636567572069194
+          ]
+        },
+        "B2_ridge": {
+          "deg50": 0.5821515794235579,
+          "ci": [
+            0.5067217191483177,
+            0.6455524212327016
+          ]
+        },
+        "B3_ridge_bio": {
+          "deg50": 0.582151621353085,
+          "ci": [
+            0.5067214715245851,
+            0.6455529953729793
+          ]
+        }
+      },
+      "grn_prop": {
+        "random": {
+          "deg50": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "trrust": {
+          "deg50": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "trrust_weighted": {
+          "error": "array must be at least 2-d"
+        },
+        "coexpr": {
+          "deg50": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "coexpr_lfc": {
+          "deg50": 0.0,
+          "ci": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "model": {
+        "none": {
+          "deg50": 0.6300086473891078,
+          "ci": [
+            0.5523969844659882,
+            0.7005164123605607
+          ],
+          "n_seeds": 3,
+          "seed_mean": 0.6300086473891078,
+          "seed_std": 0.004240647836066486
+        },
+        "random": {
+          "deg50": 0.6229260639286848,
+          "ci": [
+            0.5389050006552908,
+            0.6964234999696215
+          ],
+          "n_seeds": 3,
+          "seed_mean": 0.6229260639286848,
+          "seed_std": 0.008297621952903556
+        },
+        "trrust": {
+          "deg50": 0.6274946857178882,
+          "ci": [
+            0.5451785479742312,
+            0.6989467781356195
+          ],
+          "n_seeds": 3,
+          "seed_mean": 0.6274946857178881,
+          "seed_std": 0.00995651315439468
+        },
+        "trrust_weighted": {
+          "deg50": 0.631550020717871,
+          "ci": [
+            0.5552451687110282,
+            0.7013545373200409
+          ],
+          "n_seeds": 3,
+          "seed_mean": 0.6315500207178709,
+          "seed_std": 0.006316232029379692
+        },
+        "coexpr": {
+          "deg50": 0.6260645001290461,
+          "ci": [
+            0.5431374009723624,
+            0.6982638636610731
+          ],
+          "n_seeds": 3,
+          "seed_mean": 0.6260645001290461,
+          "seed_std": 0.004219374725066265
+        },
+        "coexpr_lfc": {
+          "deg50": 0.6249208905100018,
+          "ci": [
+            0.5442236463756821,
+            0.6982238070018537
+          ],
+          "n_seeds": 3,
+          "seed_mean": 0.6249208905100018,
+          "seed_std": 0.006813540455736825
+        }
+      },
+      "contrasts": {
+        "random_vs_none": {
+          "delta": -0.007082583460422906,
+          "ci": [
+            -0.01514732366146397,
+            -0.0002394032988638533
+          ],
+          "p": 0.04,
+          "p_holm": 0.28,
+          "p_corrected": 0.28,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "trrust_vs_none": {
+          "delta": -0.002513961671219607,
+          "ci": [
+            -0.008753617077648511,
+            0.0036074091053010502
+          ],
+          "p": 0.429,
+          "p_holm": 0.844,
+          "p_corrected": 0.844,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "trrust_weighted_vs_none": {
+          "delta": 0.001541373328763247,
+          "ci": [
+            -0.00035686864066124496,
+            0.0036440524287008297
+          ],
+          "p": 0.108,
+          "p_holm": 0.54,
+          "p_corrected": 0.54,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "coexpr_vs_none": {
+          "delta": -0.003944147260061641,
+          "ci": [
+            -0.010863968108100227,
+            0.001591045149894208
+          ],
+          "p": 0.186,
+          "p_holm": 0.744,
+          "p_corrected": 0.744,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "coexpr_lfc_vs_none": {
+          "delta": -0.005087756879106002,
+          "ci": [
+            -0.011378800915794835,
+            0.0007046046773589679
+          ],
+          "p": 0.086,
+          "p_holm": 0.516,
+          "p_corrected": 0.516,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "coexpr_lfc_vs_trrust": {
+          "delta": -0.0025737952078863945,
+          "ci": [
+            -0.006840429787777054,
+            0.0012814385338869054
+          ],
+          "p": 0.202,
+          "p_holm": 0.744,
+          "p_corrected": 0.744,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "coexpr_lfc_vs_random": {
+          "delta": 0.0019948265813169042,
+          "ci": [
+            -0.002800079553870826,
+            0.007285855399714172
+          ],
+          "p": 0.422,
+          "p_holm": 0.844,
+          "p_corrected": 0.844,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        },
+        "trrust_vs_random": {
+          "delta": 0.004568621789203299,
+          "ci": [
+            0.0008806735565154182,
+            0.008868023308396937
+          ],
+          "p": 0.014,
+          "p_holm": 0.112,
+          "p_corrected": 0.112,
+          "min_effect": 0.01,
+          "significant": false,
+          "meaningful": false,
+          "significant_and_meaningful": false
+        }
+      }
+    }
+  }
+}

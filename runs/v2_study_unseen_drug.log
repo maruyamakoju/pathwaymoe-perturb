@@ -1,1 +1,295 @@
 === tahoe_full__unseen_drug__base__none === params=44,962,465 variant=none grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.578 val_all=0.291
+  ep  2 val_DEG50=0.733 val_all=0.509
+  ep  4 val_DEG50=0.747 val_all=0.539
+  ep  6 val_DEG50=0.780 val_all=0.605
+  ep  8 val_DEG50=0.805 val_all=0.640
+  ep 10 val_DEG50=0.818 val_all=0.664
+  ep 12 val_DEG50=0.826 val_all=0.677
+  ep 14 val_DEG50=0.831 val_all=0.688
+  ep 16 val_DEG50=0.841 val_all=0.700
+  ep 18 val_DEG50=0.848 val_all=0.710
+  ep 20 val_DEG50=0.853 val_all=0.717
+  ep 22 val_DEG50=0.855 val_all=0.721
+  ep 24 val_DEG50=0.859 val_all=0.724
+  best val DEG50=0.859 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__none.pt
+=== tahoe_full__unseen_drug__base__none__s1 === params=44,962,465 variant=none grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.598 val_all=0.316
+  ep  2 val_DEG50=0.730 val_all=0.504
+  ep  4 val_DEG50=0.747 val_all=0.542
+  ep  6 val_DEG50=0.783 val_all=0.605
+  ep  8 val_DEG50=0.799 val_all=0.635
+  ep 10 val_DEG50=0.813 val_all=0.660
+  ep 12 val_DEG50=0.817 val_all=0.675
+  ep 14 val_DEG50=0.834 val_all=0.691
+  ep 16 val_DEG50=0.839 val_all=0.703
+  ep 18 val_DEG50=0.846 val_all=0.712
+  ep 20 val_DEG50=0.850 val_all=0.718
+  ep 22 val_DEG50=0.852 val_all=0.723
+  ep 24 val_DEG50=0.854 val_all=0.726
+  best val DEG50=0.854 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__none__s1.pt
+=== tahoe_full__unseen_drug__base__none__s2 === params=44,962,465 variant=none grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.576 val_all=0.307
+  ep  2 val_DEG50=0.731 val_all=0.504
+  ep  4 val_DEG50=0.751 val_all=0.541
+  ep  6 val_DEG50=0.779 val_all=0.603
+  ep  8 val_DEG50=0.799 val_all=0.631
+  ep 10 val_DEG50=0.813 val_all=0.660
+  ep 12 val_DEG50=0.823 val_all=0.677
+  ep 14 val_DEG50=0.834 val_all=0.690
+  ep 16 val_DEG50=0.843 val_all=0.703
+  ep 18 val_DEG50=0.847 val_all=0.711
+  ep 20 val_DEG50=0.853 val_all=0.718
+  ep 22 val_DEG50=0.856 val_all=0.723
+  ep 24 val_DEG50=0.859 val_all=0.727
+  best val DEG50=0.859 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__none__s2.pt
+=== tahoe_full__unseen_drug__base__random === params=44,962,465 variant=random grn_edges=539 device=cuda
+  ep  0 val_DEG50=0.611 val_all=0.319
+  ep  2 val_DEG50=0.734 val_all=0.511
+  ep  4 val_DEG50=0.753 val_all=0.547
+  ep  6 val_DEG50=0.775 val_all=0.594
+  ep  8 val_DEG50=0.800 val_all=0.644
+  ep 10 val_DEG50=0.813 val_all=0.664
+  ep 12 val_DEG50=0.822 val_all=0.675
+  ep 14 val_DEG50=0.832 val_all=0.690
+  ep 16 val_DEG50=0.838 val_all=0.699
+  ep 18 val_DEG50=0.843 val_all=0.707
+  ep 20 val_DEG50=0.849 val_all=0.715
+  ep 22 val_DEG50=0.852 val_all=0.718
+  ep 24 val_DEG50=0.855 val_all=0.722
+  best val DEG50=0.855 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__random.pt
+=== tahoe_full__unseen_drug__base__random__s1 === params=44,962,465 variant=random grn_edges=539 device=cuda
+  ep  0 val_DEG50=0.625 val_all=0.335
+  ep  2 val_DEG50=0.736 val_all=0.516
+  ep  4 val_DEG50=0.749 val_all=0.547
+  ep  6 val_DEG50=0.781 val_all=0.603
+  ep  8 val_DEG50=0.798 val_all=0.635
+  ep 10 val_DEG50=0.810 val_all=0.661
+  ep 12 val_DEG50=0.814 val_all=0.668
+  ep 14 val_DEG50=0.832 val_all=0.689
+  ep 16 val_DEG50=0.836 val_all=0.699
+  ep 18 val_DEG50=0.842 val_all=0.706
+  ep 20 val_DEG50=0.845 val_all=0.713
+  ep 22 val_DEG50=0.850 val_all=0.718
+  ep 24 val_DEG50=0.853 val_all=0.721
+  best val DEG50=0.853 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__random__s1.pt
+=== tahoe_full__unseen_drug__base__random__s2 === params=44,962,465 variant=random grn_edges=539 device=cuda
+  ep  0 val_DEG50=0.601 val_all=0.333
+  ep  2 val_DEG50=0.737 val_all=0.513
+  ep  4 val_DEG50=0.755 val_all=0.549
+  ep  6 val_DEG50=0.780 val_all=0.603
+  ep  8 val_DEG50=0.794 val_all=0.623
+  ep 10 val_DEG50=0.806 val_all=0.656
+  ep 12 val_DEG50=0.819 val_all=0.669
+  ep 14 val_DEG50=0.830 val_all=0.686
+  ep 16 val_DEG50=0.839 val_all=0.695
+  ep 18 val_DEG50=0.843 val_all=0.704
+  ep 20 val_DEG50=0.847 val_all=0.711
+  ep 22 val_DEG50=0.849 val_all=0.715
+  ep 24 val_DEG50=0.853 val_all=0.720
+  best val DEG50=0.853 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__random__s2.pt
+=== tahoe_full__unseen_drug__base__trrust === params=44,962,465 variant=trrust grn_edges=539 device=cuda
+  ep  0 val_DEG50=0.612 val_all=0.321
+  ep  2 val_DEG50=0.735 val_all=0.512
+  ep  4 val_DEG50=0.752 val_all=0.545
+  ep  6 val_DEG50=0.783 val_all=0.608
+  ep  8 val_DEG50=0.803 val_all=0.641
+  ep 10 val_DEG50=0.815 val_all=0.664
+  ep 12 val_DEG50=0.824 val_all=0.675
+  ep 14 val_DEG50=0.833 val_all=0.689
+  ep 16 val_DEG50=0.840 val_all=0.699
+  ep 18 val_DEG50=0.844 val_all=0.707
+  ep 20 val_DEG50=0.849 val_all=0.713
+  ep 22 val_DEG50=0.853 val_all=0.718
+  ep 24 val_DEG50=0.856 val_all=0.721
+  best val DEG50=0.856 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__trrust.pt
+=== tahoe_full__unseen_drug__base__trrust__s1 === params=44,962,465 variant=trrust grn_edges=539 device=cuda
+  ep  0 val_DEG50=0.625 val_all=0.334
+  ep  2 val_DEG50=0.735 val_all=0.513
+  ep  4 val_DEG50=0.749 val_all=0.547
+  ep  6 val_DEG50=0.782 val_all=0.605
+  ep  8 val_DEG50=0.798 val_all=0.634
+  ep 10 val_DEG50=0.814 val_all=0.663
+  ep 12 val_DEG50=0.819 val_all=0.673
+  ep 14 val_DEG50=0.834 val_all=0.691
+  ep 16 val_DEG50=0.838 val_all=0.701
+  ep 18 val_DEG50=0.844 val_all=0.709
+  ep 20 val_DEG50=0.848 val_all=0.715
+  ep 22 val_DEG50=0.852 val_all=0.720
+  ep 24 val_DEG50=0.855 val_all=0.723
+  best val DEG50=0.855 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__trrust__s1.pt
+=== tahoe_full__unseen_drug__base__trrust__s2 === params=44,962,465 variant=trrust grn_edges=539 device=cuda
+  ep  0 val_DEG50=0.628 val_all=0.340
+  ep  2 val_DEG50=0.736 val_all=0.513
+  ep  4 val_DEG50=0.757 val_all=0.551
+  ep  6 val_DEG50=0.783 val_all=0.604
+  ep  8 val_DEG50=0.798 val_all=0.631
+  ep 10 val_DEG50=0.811 val_all=0.658
+  ep 12 val_DEG50=0.825 val_all=0.677
+  ep 14 val_DEG50=0.835 val_all=0.691
+  ep 16 val_DEG50=0.843 val_all=0.701
+  ep 18 val_DEG50=0.847 val_all=0.710
+  ep 20 val_DEG50=0.851 val_all=0.716
+  ep 22 val_DEG50=0.853 val_all=0.720
+  ep 24 val_DEG50=0.856 val_all=0.723
+  best val DEG50=0.856 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__trrust__s2.pt
+=== tahoe_full__unseen_drug__base__trrust_weighted === params=44,962,465 variant=trrust_weighted grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.578 val_all=0.291
+  ep  2 val_DEG50=0.733 val_all=0.507
+  ep  4 val_DEG50=0.745 val_all=0.538
+  ep  6 val_DEG50=0.780 val_all=0.605
+  ep  8 val_DEG50=0.804 val_all=0.643
+  ep 10 val_DEG50=0.816 val_all=0.664
+  ep 12 val_DEG50=0.826 val_all=0.677
+  ep 14 val_DEG50=0.831 val_all=0.689
+  ep 16 val_DEG50=0.840 val_all=0.699
+  ep 18 val_DEG50=0.847 val_all=0.710
+  ep 20 val_DEG50=0.853 val_all=0.717
+  ep 22 val_DEG50=0.855 val_all=0.721
+  ep 24 val_DEG50=0.858 val_all=0.724
+  best val DEG50=0.858 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__trrust_weighted.pt
+=== tahoe_full__unseen_drug__base__trrust_weighted__s1 === params=44,962,465 variant=trrust_weighted grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.598 val_all=0.316
+  ep  2 val_DEG50=0.730 val_all=0.505
+  ep  4 val_DEG50=0.747 val_all=0.541
+  ep  6 val_DEG50=0.783 val_all=0.606
+  ep  8 val_DEG50=0.800 val_all=0.637
+  ep 10 val_DEG50=0.815 val_all=0.663
+  ep 12 val_DEG50=0.818 val_all=0.678
+  ep 14 val_DEG50=0.836 val_all=0.693
+  ep 16 val_DEG50=0.840 val_all=0.704
+  ep 18 val_DEG50=0.846 val_all=0.713
+  ep 20 val_DEG50=0.850 val_all=0.720
+  ep 22 val_DEG50=0.853 val_all=0.724
+  ep 24 val_DEG50=0.855 val_all=0.727
+  best val DEG50=0.855 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__trrust_weighted__s1.pt
+=== tahoe_full__unseen_drug__base__trrust_weighted__s2 === params=44,962,465 variant=trrust_weighted grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.576 val_all=0.307
+  ep  2 val_DEG50=0.731 val_all=0.504
+  ep  4 val_DEG50=0.751 val_all=0.540
+  ep  6 val_DEG50=0.780 val_all=0.600
+  ep  8 val_DEG50=0.797 val_all=0.632
+  ep 10 val_DEG50=0.812 val_all=0.659
+  ep 12 val_DEG50=0.821 val_all=0.675
+  ep 14 val_DEG50=0.833 val_all=0.689
+  ep 16 val_DEG50=0.842 val_all=0.702
+  ep 18 val_DEG50=0.846 val_all=0.710
+  ep 20 val_DEG50=0.851 val_all=0.717
+  ep 22 val_DEG50=0.855 val_all=0.722
+  ep 24 val_DEG50=0.858 val_all=0.726
+  best val DEG50=0.858 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__trrust_weighted__s2.pt
+=== tahoe_full__unseen_drug__base__coexpr === params=44,962,465 variant=coexpr grn_edges=538 device=cuda
+  ep  0 val_DEG50=0.612 val_all=0.321
+  ep  2 val_DEG50=0.735 val_all=0.515
+  ep  4 val_DEG50=0.744 val_all=0.535
+  ep  6 val_DEG50=0.777 val_all=0.600
+  ep  8 val_DEG50=0.804 val_all=0.642
+  ep 10 val_DEG50=0.812 val_all=0.662
+  ep 12 val_DEG50=0.823 val_all=0.674
+  ep 14 val_DEG50=0.834 val_all=0.690
+  ep 16 val_DEG50=0.838 val_all=0.698
+  ep 18 val_DEG50=0.843 val_all=0.706
+  ep 20 val_DEG50=0.847 val_all=0.713
+  ep 22 val_DEG50=0.850 val_all=0.717
+  ep 24 val_DEG50=0.854 val_all=0.721
+  best val DEG50=0.854 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__coexpr.pt
+=== tahoe_full__unseen_drug__base__coexpr__s1 === params=44,962,465 variant=coexpr grn_edges=538 device=cuda
+  ep  0 val_DEG50=0.627 val_all=0.334
+  ep  2 val_DEG50=0.735 val_all=0.515
+  ep  4 val_DEG50=0.747 val_all=0.544
+  ep  6 val_DEG50=0.783 val_all=0.603
+  ep  8 val_DEG50=0.801 val_all=0.640
+  ep 10 val_DEG50=0.814 val_all=0.662
+  ep 12 val_DEG50=0.816 val_all=0.670
+  ep 14 val_DEG50=0.834 val_all=0.689
+  ep 16 val_DEG50=0.838 val_all=0.700
+  ep 18 val_DEG50=0.845 val_all=0.708
+  ep 20 val_DEG50=0.848 val_all=0.714
+  ep 22 val_DEG50=0.853 val_all=0.720
+  ep 24 val_DEG50=0.856 val_all=0.723
+  best val DEG50=0.856 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__coexpr__s1.pt
+=== tahoe_full__unseen_drug__base__coexpr__s2 === params=44,962,465 variant=coexpr grn_edges=538 device=cuda
+  ep  0 val_DEG50=0.608 val_all=0.335
+  ep  2 val_DEG50=0.735 val_all=0.513
+  ep  4 val_DEG50=0.752 val_all=0.546
+  ep  6 val_DEG50=0.782 val_all=0.604
+  ep  8 val_DEG50=0.796 val_all=0.626
+  ep 10 val_DEG50=0.807 val_all=0.657
+  ep 12 val_DEG50=0.820 val_all=0.671
+  ep 14 val_DEG50=0.830 val_all=0.684
+  ep 16 val_DEG50=0.839 val_all=0.694
+  ep 18 val_DEG50=0.843 val_all=0.704
+  ep 20 val_DEG50=0.847 val_all=0.710
+  ep 22 val_DEG50=0.849 val_all=0.714
+  ep 24 val_DEG50=0.853 val_all=0.718
+  best val DEG50=0.853 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__coexpr__s2.pt
+=== tahoe_full__unseen_drug__base__coexpr_lfc === params=44,962,465 variant=coexpr_lfc grn_edges=538 device=cuda
+  ep  0 val_DEG50=0.614 val_all=0.325
+  ep  2 val_DEG50=0.734 val_all=0.513
+  ep  4 val_DEG50=0.751 val_all=0.545
+  ep  6 val_DEG50=0.779 val_all=0.602
+  ep  8 val_DEG50=0.800 val_all=0.642
+  ep 10 val_DEG50=0.812 val_all=0.662
+  ep 12 val_DEG50=0.821 val_all=0.674
+  ep 14 val_DEG50=0.832 val_all=0.688
+  ep 16 val_DEG50=0.836 val_all=0.696
+  ep 18 val_DEG50=0.840 val_all=0.704
+  ep 20 val_DEG50=0.845 val_all=0.711
+  ep 22 val_DEG50=0.848 val_all=0.715
+  ep 24 val_DEG50=0.852 val_all=0.719
+  best val DEG50=0.852 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__coexpr_lfc.pt
+=== tahoe_full__unseen_drug__base__coexpr_lfc__s1 === params=44,962,465 variant=coexpr_lfc grn_edges=538 device=cuda
+  ep  0 val_DEG50=0.626 val_all=0.337
+  ep  2 val_DEG50=0.735 val_all=0.515
+  ep  4 val_DEG50=0.749 val_all=0.548
+  ep  6 val_DEG50=0.785 val_all=0.611
+  ep  8 val_DEG50=0.800 val_all=0.639
+  ep 10 val_DEG50=0.810 val_all=0.660
+  ep 12 val_DEG50=0.815 val_all=0.671
+  ep 14 val_DEG50=0.831 val_all=0.687
+  ep 16 val_DEG50=0.835 val_all=0.698
+  ep 18 val_DEG50=0.842 val_all=0.707
+  ep 20 val_DEG50=0.846 val_all=0.714
+  ep 22 val_DEG50=0.850 val_all=0.719
+  ep 24 val_DEG50=0.852 val_all=0.722
+  best val DEG50=0.852 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__coexpr_lfc__s1.pt
+=== tahoe_full__unseen_drug__base__coexpr_lfc__s2 === params=44,962,465 variant=coexpr_lfc grn_edges=538 device=cuda
+  ep  0 val_DEG50=0.609 val_all=0.338
+  ep  2 val_DEG50=0.736 val_all=0.514
+  ep  4 val_DEG50=0.755 val_all=0.550
+  ep  6 val_DEG50=0.782 val_all=0.603
+  ep  8 val_DEG50=0.796 val_all=0.634
+  ep 10 val_DEG50=0.807 val_all=0.656
+  ep 12 val_DEG50=0.818 val_all=0.669
+  ep 14 val_DEG50=0.829 val_all=0.685
+  ep 16 val_DEG50=0.837 val_all=0.694
+  ep 18 val_DEG50=0.841 val_all=0.703
+  ep 20 val_DEG50=0.845 val_all=0.710
+  ep 22 val_DEG50=0.847 val_all=0.714
+  ep 24 val_DEG50=0.852 val_all=0.718
+  best val DEG50=0.852 -> E:\vc_project_data\checkpoints\tahoe_full__unseen_drug__base__coexpr_lfc__s2.pt
+
+=== unseen_drug  (n_test=1707, clusters=39) ===
+  baseline B1_mean_effect   0.608 [0.546,0.664]
+  baseline B2_ridge         0.582 [0.507,0.646]
+  baseline B3_ridge_bio     0.582 [0.507,0.646]
+  GRNprop[random        ] 0.000 [0.000,0.000]
+  GRNprop[trrust        ] 0.000 [0.000,0.000]
+  GRNprop[coexpr        ] 0.000 [0.000,0.000]
+  GRNprop[coexpr_lfc    ] 0.000 [0.000,0.000]
+  MoE[none          ]   0.630 [0.552,0.701] (n=3)
+  MoE[random        ]   0.623 [0.539,0.696] (n=3)
+  MoE[trrust        ]   0.627 [0.545,0.699] (n=3)
+  MoE[trrust_weighted]   0.632 [0.555,0.701] (n=3)
+  MoE[coexpr        ]   0.626 [0.543,0.698] (n=3)
+  MoE[coexpr_lfc    ]   0.625 [0.544,0.698] (n=3)
+  random_vs_none: Δ=-0.007 p_holm=0.280 
+  trrust_vs_none: Δ=-0.003 p_holm=0.844 
+  trrust_weighted_vs_none: Δ=+0.002 p_holm=0.540 
+  coexpr_vs_none: Δ=-0.004 p_holm=0.744 
+  coexpr_lfc_vs_none: Δ=-0.005 p_holm=0.516 
+  coexpr_lfc_vs_trrust: Δ=-0.003 p_holm=0.744 
+  coexpr_lfc_vs_random: Δ=+0.002 p_holm=0.844 
+  trrust_vs_random: Δ=+0.005 p_holm=0.112 
+
+wrote C:\Users\07013\Desktop\0522rd4\results\study_tahoe_full_v2.json
