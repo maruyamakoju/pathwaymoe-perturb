@@ -1,70 +1,80 @@
-# PathwayMoE-Perturb
+# PathwayMoE-Perturb — When does gene-regulatory structure help perturbation prediction?
 
-A small (~1–200M param), **GRN-sparsity-constrained, pathway Mixture-of-Experts** for virtual-cell
-perturbation prediction, built to test whether *inductive bias* (not scale) is what closes the gap
-to linear baselines on out-of-distribution perturbation prediction.
+A leakage-audited, statistically rigorous study of whether a **gene-regulatory-network (GRN)
+inductive bias** improves *out-of-distribution* single-cell perturbation prediction — motivated by
+the 2025 *Nature Methods* finding that billion-parameter foundation models do not beat linear
+baselines. We hold the architecture fixed and vary only the **GRN quality** (none → random → curated
+TRRUST → weighted → data-derived co-expression/co-response → ground-truth) and the **injection
+mechanism** (hard attention mask vs soft GNN message-passing).
 
-Motivation: *"Deep-learning-based gene perturbation effect prediction does not yet outperform simple
-linear baselines"* (Nature Methods 2025). Giant foundation models often fail to beat ridge
-regression on held-out perturbations. This repo (a) builds the linear baselines **properly and
-first**, and (b) tests a biology-constrained architecture against them on identical splits/metrics.
+## TL;DR finding
 
-## What's here
+> A structured GRN prior confers **no significant benefit** for OOD perturbation prediction **where
+> prediction is feasible** — on a 22.6M-cell real Tahoe-100M subset and on synthetic data with shared
+> drug targets it is *redundant* (a flexible model learns the response directly). The true GRN only
+> *hints* at helping for **novel targets** (+0.06 DEG-Pearson, not significant), a near-unpredictable
+> regime, and the **injection mechanism does not matter**.
+
+| Model (unseen-drug, 39 drug clusters, cluster-bootstrap 95% CI) | DEG-Pearson@50 |
+|---|---|
+| ridge (B2/B3) | 0.582 |
+| mean-effect (B1) | 0.608 |
+| PathwayMoE, **no GRN** | **0.630** |
+| PathwayMoE, TRRUST / weighted / co-expr / co-response / random | 0.623–0.629 (all Δ vs none ≤0.007, ns) |
+
+Full numbers, synthetic positive control, and discussion: [`results/PAPER.md`](results/PAPER.md).
+Methodology critique + the three result-invalidating bugs we caught: [`AUDIT.md`](AUDIT.md).
+
+## Why this is trustworthy (the rigor)
+
+- **No leakage**: data-derived GRNs are built from *training conditions only*, per split
+  (`leakage_safe=true`); a regression test asserts test rows can't change the GRN.
+- **Cluster bootstrap** (resampling drugs/cell-lines, the real independent units) + **Holm**
+  correction + pre-registered **minimum meaningful effect** (0.01); we report the # of test clusters.
+- **Deterministic fp32 eval**; headline numbers independently re-verified by direct recompute.
+- **43 unit/integration tests** incl. a leakage regression test.
+- We caught and fixed **three result-invalidating bugs** (test-set GRN leakage; a silent
+  train-without-GRN fallback; bf16 metric nondeterminism) — see `AUDIT.md` (items A, J, K).
+
+## Package layout (`pmoe/`)
 
 ```
-code/
-  config.py      paths/seeds (data root = E:\vc_project_data)
-  schema → data/schema.md   the interface contract every module obeys
-  synth.py       synthetic Tahoe-shaped data WITH known GRN/pathway ground truth
-  preprocess.py  real Tahoe-100M h5ad -> condition-level parquet (best-effort, schema-configurable)
-  drugs.py       Morgan FP + ChemBERTa (offline fallback)
-  grn.py         DoRothEA -> sparse GRN mask (offline fallback)
-  pathways.py    Reactome -> gene×pathway multi-hot (offline fallback)
-  splits.py      unseen_drug (Tanimoto<0.8 Butina dedupe) / unseen_cell_line / unseen_both
-  metrics.py     Pearson(all), DEG-Pearson@{20,50,100}, MSE, direction accuracy
-  baselines.py   B1 mean-effect, B2 ridge, B3 ridge+biology
-  model.py       PathwayMoE-Perturb (SDPA mixed GRN/dense attn, pathway top-2 MoE, pert cross-attn)
-  data.py        condition-level dataset + collator
-  train.py       AdamW(+cosine,bf16,grad-ckpt), weighted-Huber + load-balance loss
-  eval.py        baselines vs model comparison table across 3 splits
-  figures.py     comparison bar, training curves, expert-usage heatmap
-tests/smoke.py   fast end-to-end validation
-run_all.ps1      orchestration
+pmoe/
+  config.py        typed configs, enums, RunSpec (single source for paths/seeds/names)
+  io.py            checkpoint + env/data provenance manifests
+  data/            loader, leakage-controlled splits (+cluster groups), dataset/collator
+  priors/          grn.py (variant spectrum, TRAIN-ONLY data-derived), pathways, drugs (ChemBERTa)
+  models/          pathway_moe (GRN-masked SDPA attn + pathway MoE + pert cross-attn),
+                   layers (incl. GRNPropagation soft message-passing), baselines (+GRN-propagation)
+  eval/            metrics (DEG-Pearson@K), stats (cluster bootstrap, Holm, effect size), loading,
+                   report (tables+figures)
+  experiments/     train (robust in-process), study (grid runner), mechanism (mask vs propagation)
+tests/             43 tests incl. test_grn_leakage.py
+code/              v1 scripts (superseded by pmoe/; kept for provenance)
 ```
 
-## Quickstart (native Windows)
+Data + checkpoints live on `E:\vc_project_data` (`VC_DATA_ROOT`); not in the repo.
+
+## Reproduce
 
 ```powershell
-.\.venv\Scripts\activate
-$env:VC_DATA_ROOT = "E:\vc_project_data"
-python tests\smoke.py            # validate the whole pipeline in ~1 min
-.\run_all.ps1 synthetic          # data -> baselines -> train 3 splits -> eval -> figures
+.\.venv\Scripts\activate ; $env:VC_DATA_ROOT="E:\vc_project_data"
+python -m pytest -q                                   # 43 tests
+# synthetic (controlled) + positive control:
+python code\synth.py --dataset synthetic
+python -m pmoe.experiments.study  --dataset synthetic --splits unseen_drug --variants none random coexpr coexpr_lfc ground_truth
+python code\synth.py --dataset synthetic_hard_big --unique-targets --n-extra-drugs 150
+python -m pmoe.experiments.mechanism --dataset synthetic_hard_big
+# real Tahoe (needs the 22.6M-cell subset; see code\preprocess_tahoe_stream.py to build it):
+python -m pmoe.experiments.study  --dataset tahoe_full --splits unseen_drug \
+       --variants none random trrust trrust_weighted coexpr coexpr_lfc
+python -m pmoe.eval.report --dataset tahoe_full        # table + figure
 ```
 
-Real data: download a Tahoe-100M subset to `E:\vc_project_data\data\tahoe100m`, then
-`python code\preprocess.py --dry-run` to inspect obs columns, set `--cell-line-col/--drug-col/
---control-value`, run without `--dry-run`, then `run_all.ps1 tahoe`.
+See `reproduce.ps1` for the end-to-end script.
 
-## Environment adaptations from the original spec
+## Status
 
-- **Native Windows** (not Linux/WSL2): Triton/flash-attn omitted; mixed GRN-masked/dense attention
-  uses two PyTorch SDPA passes. WSL2 Ubuntu is available if the block-sparse kernel is later needed.
-- **Data on E:** (4.5 TB) — C: had only ~100 GB free. Set via `VC_DATA_ROOT`.
-- **Condition-level (pseudobulk) modeling** so the model is directly comparable to the linear
-  baselines and the field's DEG-Pearson metric.
-
-## Results (see `results/REPORT.md`)
-
-DEG-Pearson@50, out-of-distribution test splits:
-
-| | unseen_drug | unseen_cell_line | unseen_both |
-|---|---|---|---|
-| **Synthetic** (GRN ground truth) — best baseline | 0.704 | **0.988** | 0.698 |
-| **Synthetic** — PathwayMoE | **0.724** | 0.930 | **0.712** |
-| **Real Tahoe-100M** — best baseline | **0.715** | 0.432 | 0.324 |
-| **Real Tahoe-100M** — PathwayMoE | 0.704 | **0.551** | **0.512** |
-
-The biology-constrained model beats strong linear baselines on the hard OOD splits (decisively on
-the hardest, unseen-both); on synthetic, ablations show the **GRN mask** is the driver, but on real
-data the generic TRRUST-over-HVGs GRN is neutral — the real-data gains come from the broader
-architecture. Honest, non-overclaimed, and reproducible.
+Native Windows + RTX 4090. Real data = 803/3388 Tahoe-100M shards (22.66M cells → 8,875 conditions ×
+2,000 HVGs, mean 2,480 cells/condition, matched DMSO controls). This is a research artifact, not a
+package release; the conclusion (GRN-as-prior is redundant where prediction is feasible) is robust.

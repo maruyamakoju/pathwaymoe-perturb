@@ -176,11 +176,18 @@ not how to realize the benefit — the information it encodes is either redundan
 insufficient (novel-target) for this task at this scale.
 
 ## 5. Limitations
-2,000 HVGs (not full transcriptome); GRN as a (mostly binary) attention mask — weighted GRN tested but
-soft-/message-passing integration not exhausted; one model family (PathwayMoE); co-response GRN is
-correlational; synthetic generative process is a simplification of real regulation; GRN-propagation
-baseline is degenerate without drug→target labels (real data) and was not the focus.
+2,000 HVGs (not full transcriptome); one model family (PathwayMoE) — though we tested two GRN
+*injection mechanisms* (hard mask and soft message-passing), both null; co-response GRN is
+correlational, not causal; the synthetic generative process simplifies real regulation; the
+GRN-propagation baseline needs drug→target labels (absent on the Tahoe subset). The novel-target
+positive control, while suggestive (+0.06), is underpowered by the intrinsic difficulty of that
+regime, so we cannot confirm a GRN benefit at p<0.05 even where one is plausible.
 
-## 6. Reproducibility
-`code/preprocess_tahoe_stream.py`, `build_grn_variants.py`, `run_study.py`, `stats.py`. Seeds fixed;
-splits fixed; 95% CIs + paired bootstrap. Data on E:, 803 shards listed in meta.json.
+## 6. Reproducibility & availability
+Code: the typed `pmoe/` package (`experiments/{study,mechanism,train}.py`, `priors/grn.py`,
+`eval/{metrics,stats,loading,report}.py`) + `reproduce.ps1`; 43 tests incl. a leakage regression test.
+Split seed fixed (identical test set across variants/seeds); 3 model seeds; deterministic fp32 eval;
+cluster-bootstrap 95% CIs + Holm correction. Each checkpoint stores an env+data provenance manifest
+(library versions, gene-list hash, shard count). Results: `results/study_*_v2.json`,
+`mechanism_*.json`, figures `results/fig_grn_study_*_v2.png`. Real data = 803/3,388 Tahoe-100M shards
+(22.66M cells) on `E:\vc_project_data`; rebuild via `code/preprocess_tahoe_stream.py`.

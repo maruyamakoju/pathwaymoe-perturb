@@ -2,8 +2,9 @@
 __pycache__/
 *.pyc
 runs/*.jsonl
-results/*.png
+runs/*.log
 wandb/
 *.pt
+# result figures + JSON/MD tables ARE committed (inspectable artifact)
 # data + checkpoints live on E:\vc_project_data (not in repo)
 data/*/processed/
