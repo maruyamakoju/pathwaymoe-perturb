@@ -17,12 +17,12 @@ with vs. held out from training). **Result:** with leakage-free GRNs and cluster
 **no GRN prior — generic, weighted, or data-derived — significantly improves real-data OOD prediction**
 (all |Δ DEG-Pearson|≤0.007, Holm-p>0.1), although the deep model beats linear baselines. On synthetic
 data we localize why: when test perturbations **share targets** with training, even the *true* GRN is
-redundant (the model learns the response directly); only when targets are **novel** is the GRN in
-principle needed, but there the task is near-unpredictable and the GRN gives only weak, *non-specific*
-regularization (a random mask helps as much). We conclude that injecting a static, binary GRN as an
+redundant (the model learns the response directly); when targets are **novel**, the task is
+near-unpredictable and even the **ground-truth GRN at full statistical power** (39 clusters) gives no
+significant benefit (Δ=−0.003, p=0.86). We conclude that injecting a static, binary GRN as an
 attention mask is not an effective inductive bias for this task — the structure it encodes is either
-redundant or insufficient, depending on target overlap. We release a typed, tested, leakage-audited
-benchmarking package (`pmoe/`).
+redundant (shared targets) or insufficient (novel targets) for OOD perturbation prediction. We release
+a typed, tested, leakage-audited benchmarking package (`pmoe/`).
 
 ## 1. Introduction
 
@@ -127,8 +127,15 @@ matter most, and the positive control that the measurement is *sensitive*.
   *does* detect a GRN benefit when one exists — but random vs none Δ=+0.022 (p=0.10), i.e. of similar
   magnitude, and absolute DEG-Pearson is near zero for all models (novel-target extrapolation is
   near-impossible). The benefit is weak and **non-specific** (any sparse mask ≈ true GRN).
-- **Well-powered (192 drugs, 39 clusters):** ground_truth vs none Δ = **[BIG_GT]**; random vs none Δ =
-  **[BIG_RAND]** (Holm-p **[BIG_P]**). [interpretation slotted on completion]
+- **Well-powered (192 drugs, 39 clusters — same power as real data):** all models near zero
+  (none 0.024, random 0.019, ground_truth 0.021); **ground_truth vs none Δ=−0.003 (Holm-p=0.86)**,
+  random vs none Δ=−0.005 (p=0.86) — **no significant benefit**. The +0.019 "significance" at 9
+  clusters was a low-power artifact that vanishes under proper powering. Held-out *unique* targets are
+  essentially unpredictable (DEG-Pearson ≈ 0) and the true GRN does not change that.
+
+**Bottom line across all regimes:** the GRN attention mask never confers a significant, specific
+benefit — not on real data, not when the GRN is redundant (shared-target), and not when it should be
+essential (novel-target), even with the ground-truth GRN at full statistical power.
 
 ## 4. Discussion
 
@@ -139,13 +146,17 @@ GRN-structured attention mask provides **no robust, specific benefit** for OOD p
 - On **synthetic shared-target** data, even the *true* GRN is redundant: with targets seen in training,
   the model learns the perturbation response directly.
 - On **synthetic novel-target** data, where the GRN is in principle essential, the task becomes
-  near-unpredictable and the GRN contributes only weak, non-specific regularization.
+  near-unpredictable and even the ground-truth GRN at full power gives no significant benefit
+  (Δ=−0.003, p=0.86); held-out unique targets are essentially unpredictable.
 
-The unifying explanation is about **what generalization the GRN enables**: a hard attention mask helps
-only when the test perturbation must be propagated from a *novel* node to known genes — a regime where
-prediction is anyway near-impossible. Whenever test perturbations share targets/pathways with training
-(the realistic case, and the case in Tahoe's ~1k drugs over shared pathways), a flexible model learns
-the response from data and the structural prior is redundant. The leakage-free design matters: a
+A likely mechanism, beyond the redundancy/insufficiency dichotomy, is **mask sparsity**: with
+500–4,500 edges over 2,000 gene tokens, GRN-masked attention heads see ~1–2 neighbours per gene and are
+effectively starved, so the dense heads carry the model and the masked heads add little. The unifying
+explanation is about **what generalization the GRN enables**: a hard mask could only help when a test
+perturbation must propagate from a *novel* node to known genes — a regime where prediction is anyway
+near-impossible. Whenever test perturbations share targets/pathways with training (the realistic case,
+incl. Tahoe's drugs over shared pathways), a flexible model learns the response from data and the
+structural prior is redundant. The leakage-free design matters: a
 test-aware co-response GRN (the variant most likely to look good) is exactly Δ=−0.005 — naïvely
 including test correlations would have manufactured a spurious positive.
 

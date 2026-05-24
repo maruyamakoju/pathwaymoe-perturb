@@ -110,3 +110,86 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
   ep 12 val_DEG50=0.333 val_all=0.112
   ep 14 val_DEG50=0.368 val_all=0.126
   ep 16 val_DEG50=0.398 val_all=0.148
+  ep 18 val_DEG50=0.430 val_all=0.172
+  ep 20 val_DEG50=0.431 val_all=0.188
+  ep 22 val_DEG50=0.465 val_all=0.214
+  ep 24 val_DEG50=0.490 val_all=0.228
+  ep 26 val_DEG50=0.501 val_all=0.235
+  ep 28 val_DEG50=0.512 val_all=0.241
+  ep 30 val_DEG50=0.520 val_all=0.251
+  ep 32 val_DEG50=0.533 val_all=0.259
+  ep 34 val_DEG50=0.535 val_all=0.263
+  best val DEG50=0.535 -> E:\vc_project_data\checkpoints\synthetic_hard_big__unseen_drug__base__random__s2.pt
+=== synthetic_hard_big__unseen_drug__base__ground_truth === params=23,908,945 variant=ground_truth grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.027 val_all=0.005
+  ep  2 val_DEG50=0.229 val_all=0.040
+  ep  4 val_DEG50=0.248 val_all=0.049
+  ep  6 val_DEG50=0.229 val_all=0.057
+  ep  8 val_DEG50=0.282 val_all=0.089
+  ep 10 val_DEG50=0.323 val_all=0.100
+  ep 12 val_DEG50=0.352 val_all=0.122
+  ep 14 val_DEG50=0.381 val_all=0.141
+  ep 16 val_DEG50=0.401 val_all=0.157
+  ep 18 val_DEG50=0.428 val_all=0.170
+  ep 20 val_DEG50=0.457 val_all=0.190
+  ep 22 val_DEG50=0.460 val_all=0.198
+  ep 24 val_DEG50=0.487 val_all=0.212
+  ep 26 val_DEG50=0.489 val_all=0.216
+  ep 28 val_DEG50=0.507 val_all=0.230
+  ep 30 val_DEG50=0.511 val_all=0.237
+  ep 32 val_DEG50=0.519 val_all=0.243
+  ep 34 val_DEG50=0.528 val_all=0.253
+  best val DEG50=0.528 -> E:\vc_project_data\checkpoints\synthetic_hard_big__unseen_drug__base__ground_truth.pt
+=== synthetic_hard_big__unseen_drug__base__ground_truth__s1 === params=23,908,945 variant=ground_truth grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.056 val_all=0.010
+  ep  2 val_DEG50=0.226 val_all=0.039
+  ep  4 val_DEG50=0.258 val_all=0.051
+  ep  6 val_DEG50=0.241 val_all=0.057
+  ep  8 val_DEG50=0.240 val_all=0.070
+  ep 10 val_DEG50=0.289 val_all=0.088
+  ep 12 val_DEG50=0.324 val_all=0.108
+  ep 14 val_DEG50=0.359 val_all=0.129
+  ep 16 val_DEG50=0.380 val_all=0.140
+  ep 18 val_DEG50=0.410 val_all=0.165
+  ep 20 val_DEG50=0.432 val_all=0.183
+  ep 22 val_DEG50=0.459 val_all=0.200
+  ep 24 val_DEG50=0.481 val_all=0.217
+  ep 26 val_DEG50=0.489 val_all=0.226
+  ep 28 val_DEG50=0.508 val_all=0.235
+  ep 30 val_DEG50=0.518 val_all=0.244
+  ep 32 val_DEG50=0.524 val_all=0.248
+  ep 34 val_DEG50=0.532 val_all=0.257
+  best val DEG50=0.532 -> E:\vc_project_data\checkpoints\synthetic_hard_big__unseen_drug__base__ground_truth__s1.pt
+=== synthetic_hard_big__unseen_drug__base__ground_truth__s2 === params=23,908,945 variant=ground_truth grn_edges=0 device=cuda
+  ep  0 val_DEG50=0.004 val_all=0.002
+  ep  2 val_DEG50=0.217 val_all=0.039
+  ep  4 val_DEG50=0.251 val_all=0.051
+  ep  6 val_DEG50=0.233 val_all=0.057
+  ep  8 val_DEG50=0.249 val_all=0.078
+  ep 10 val_DEG50=0.272 val_all=0.086
+  ep 12 val_DEG50=0.322 val_all=0.104
+  ep 14 val_DEG50=0.362 val_all=0.125
+  ep 16 val_DEG50=0.388 val_all=0.141
+  ep 18 val_DEG50=0.417 val_all=0.166
+  ep 20 val_DEG50=0.422 val_all=0.184
+  ep 22 val_DEG50=0.466 val_all=0.209
+  ep 24 val_DEG50=0.485 val_all=0.224
+  ep 26 val_DEG50=0.501 val_all=0.232
+  ep 28 val_DEG50=0.514 val_all=0.238
+  ep 30 val_DEG50=0.521 val_all=0.248
+  ep 32 val_DEG50=0.532 val_all=0.258
+  ep 34 val_DEG50=0.536 val_all=0.262
+  best val DEG50=0.536 -> E:\vc_project_data\checkpoints\synthetic_hard_big__unseen_drug__base__ground_truth__s2.pt
+
+=== unseen_drug  (n_test=1230, clusters=39) ===
+  baseline B1_mean_effect   0.054 [-0.048,0.158]
+  baseline B2_ridge         0.008 [-0.073,0.100]
+  baseline B3_ridge_bio     0.031 [-0.087,0.152]
+  GRNprop[random        ] 0.000 [0.000,0.000]
+  MoE[none          ]   0.024 [-0.055,0.099] (n=3)
+  MoE[random        ]   0.019 [-0.060,0.094] (n=3)
+  MoE[ground_truth  ]   0.021 [-0.059,0.098] (n=3)
+  random_vs_none: Δ=-0.005 p_holm=0.862 
+  ground_truth_vs_none: Δ=-0.003 p_holm=0.862 
+
+wrote C:\Users\07013\Desktop\0522rd4\results\study_synthetic_hard_big_v2.json
