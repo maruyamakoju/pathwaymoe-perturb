@@ -23,7 +23,17 @@ mechanism** (hard attention mask vs soft GNN message-passing).
 | PathwayMoE, TRRUST / weighted / co-expr / co-response / random | 0.623–0.629 (all Δ vs none ≤0.007, ns) |
 
 Full numbers, synthetic positive control, and discussion: [`results/PAPER.md`](results/PAPER.md).
+One-page summary + the money figure: [`results/SUMMARY.md`](results/SUMMARY.md).
 Methodology critique + the three result-invalidating bugs we caught: [`AUDIT.md`](AUDIT.md).
+
+### Scope & honest framing (please don't over-read this)
+This is a rigorous **negative/limited result on one common design**: a GRN injected as an attention
+mask or message-passing prior, one model family (PathwayMoE), 2,000 HVGs, the Tahoe-100M chemical-
+perturbation setting. We do **not** claim GRNs are useless in general, nor that no architecture can use
+them — only that *this* prior does not improve OOD perturbation prediction **where prediction is
+feasible** (shared targets), and is at best suggestive (ns) where targets are novel. The original
+"small biology-constrained model beats giant foundation models" claim was **not** tested here (we
+pivoted to the controlled GRN-quality study); a head-to-head vs scGPT/STATE/Tahoe-x1 is future work.
 
 ## Why this is trustworthy (the rigor)
 
