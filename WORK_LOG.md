@@ -91,3 +91,24 @@ Note: pre-existing 4 failing tests were FIXED (now 44 pytest pass). New untracke
 code/{analyze_gate_degeneracy,run_long_static,run_steelman,run_multiseed_confirm}.py,
 results/{LATENT_GRN_STUDY.md,multiseed_confirm.json,steelman_results.json,
 interpretability/gate_degeneracy_report*.json}.
+
+## RESULT 3: real-Tahoe OOD "wins" do NOT survive the leakage-free protocol (2026-05-27)
+comparison_tahoe.md claimed PathwayMoE beats baselines on hard OOD (cell_line 0.551>0.432,
+both 0.512>0.324). Those are V1 (HVG-leakage bug B) and were never re-run clean. Re-ran
+unseen_cell_line + unseen_both leakage-free (variant=none, 3 seeds, 25ep, batch48 — batch96
+OOM-hung at 24GB):
+  unseen_cell_line (10 clusters): ridge 0.868 / mean 0.850 / MoE 0.824 -> MoE LOSES to ridge
+    by -0.044 (p<0.001, sig&meaningful).
+  unseen_both (33 clusters): mean 0.607 / MoE 0.581 / ridge 0.390 -> MoE ties/slightly below
+    mean-effect (-0.026, p=0.47); only beats the weak ridge.
+The V1 baselines were corrupted-low (0.43/0.32 -> clean 0.85/0.61). The deep model does NOT
+beat strong linear baselines on real OOD. Consistent with the paper's own thesis.
+Writeup: results/REAL_TAHOE_OOD_AUDIT.md. comparison_tahoe.md flagged SUPERSEDED. Merged into
+study_tahoe_full_v2.json (3 splits). Added MoE-vs-baseline paired bootstrap to study.py.
+
+## OVERALL HONEST PICTURE (after this session)
+On real Tahoe OOD perturbation prediction: (1) GRN prior doesn't help (V2, solid);
+(2) dynamic/latent GRN doesn't help + gate is degenerate (this session); (3) the deep
+PathwayMoE itself does NOT beat linear baselines (this session). The project's defensible
+contribution is the rigorous, leakage-audited NEGATIVE: structured-bias deep models tie or
+lose to ridge/mean-effect here. The earlier positive headlines were leakage/epoch artifacts.

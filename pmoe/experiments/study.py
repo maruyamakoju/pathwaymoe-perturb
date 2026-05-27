@@ -100,6 +100,7 @@ def analyze(dataset, splits, variants, seeds, size="base"):
                 v = deg_pearson_per_condition(Bl.predict(df, te), Yte, 50)
                 m, lo, hi = cluster_bootstrap_ci(v, gte)
                 res["baselines"][Bl.name] = {"deg50": m, "ci": [lo, hi]}
+                pc[Bl.name] = v  # keep per-condition array for MoE-vs-baseline paired test
             except Exception as e:
                 res["baselines"][getattr(Bl, "name", str(Bl))] = {"error": str(e)[:120]}
 
@@ -152,6 +153,20 @@ def analyze(dataset, splits, variants, seeds, size="base"):
             res["contrasts"][key] = {**d, "p_holm": corr.get(key),
                                      **effect_summary(d["delta"], d["ci"], corr.get(key, 1.0),
                                                       MIN_MEANINGFUL_EFFECT)}
+
+        # Separate family: does the deep MoE (no-GRN) actually beat the linear baselines OOD?
+        # Kept out of the GRN-contrast Holm family so published GRN p-values are unchanged.
+        res["model_vs_baseline"] = {}
+        mb_raw, mb_details = {}, {}
+        for a, b in [("none", "B1_mean_effect"), ("none", "B2_ridge")]:
+            if a in pc and b in pc:
+                d = paired_cluster_bootstrap(pc[a], pc[b], gte)
+                k = f"{a}_vs_{b}"; mb_raw[k] = d["p"]; mb_details[k] = d
+        mb_corr = holm_correction(mb_raw) if mb_raw else {}
+        for k, d in mb_details.items():
+            res["model_vs_baseline"][k] = {**d, "p_holm": mb_corr.get(k),
+                                           **effect_summary(d["delta"], d["ci"], mb_corr.get(k, 1.0),
+                                                            MIN_MEANINGFUL_EFFECT)}
         study["splits"][split] = res
         _print_split(split, res)
 
