@@ -1,6 +1,8 @@
 # When does gene-regulatory structure help perturbation prediction? A controlled study from synthetic ground truth to 22M real cells
 
-*Draft — results filled from `study_tahoe_full.json` after the grid completes.*
+*Working draft. All numbers are populated from `results/study_*_v2.json`,
+`mechanism_synthetic_hard_big.json`, and the OOD audit (`REAL_TAHOE_OOD_AUDIT.md`); figures in
+`results/fig_*`. Reproduce with `reproduce.ps1` on the `pmoe/` package (44 tests).*
 
 ## Abstract
 
@@ -33,9 +35,40 @@ tested, leakage-audited benchmarking package (`pmoe/`).
 
 ## 1. Introduction
 
-[Gap: foundation models tie ridge on OOD perturbation; community proposes biology-structured priors;
-but it is unclear whether the *prior* helps or the *architecture*, and whether a *generic* GRN is
-even the right structure. We isolate GRN quality as a controlled variable.]
+Predicting how single cells respond to unseen perturbations — new drugs, new cell lines, or both — is
+a central goal of computational cell biology. Yet a 2025 *Nature Methods* benchmark reported that
+billion-parameter single-cell foundation models do **not** beat simple linear baselines (ridge
+regression, per-perturbation mean effects) on out-of-distribution (OOD) perturbation-response
+prediction. A natural and widely pursued response is to inject **biology-structured inductive biases**:
+restrict attention to gene-regulatory-network (GRN) edges, group computation by pathways (Mixture-of-
+Experts), or propagate perturbation signals along a regulatory graph (GEARS-style message passing). The
+implicit hypothesis is that encoding *which genes regulate which* gives a model the right scaffold to
+generalize where a flexible black box cannot.
+
+This hypothesis is rarely tested cleanly. Reported gains conflate three distinct factors: (i) the
+**structural prior** (the GRN) versus the **architecture** that carries it; (ii) a **generic** curated
+GRN versus one that is actually informative for the task; and (iii) genuine signal versus **leakage** —
+data-derived networks and feature-selection steps that quietly see the test set. As a result it is
+unclear whether a GRN prior helps, and if so, on *what kind* of GRN and in *what regime*.
+
+We therefore ask a sharper, controlled question than "does biology help?": **holding the architecture
+fixed, does GRN *quality* move OOD accuracy?** We sweep the prior across a quality spectrum — none,
+random (density-matched), generic curated (TRRUST), data-derived co-expression and co-response, and, on
+synthetic data, the *true* generative GRN — changing only *which* edges the model may attend to. We
+evaluate on (i) a 22.6M-cell, 8,875-condition subset of Tahoe-100M with real priors and (ii) synthetic
+data whose generative process *is* GRN propagation, in shared-target and novel-target regimes, with a
+leakage-free, cluster-bootstrap, Holm-corrected protocol and a pre-registered minimum meaningful effect.
+
+**Contributions.** (1) A controlled GRN-*quality* study, not just a presence/absence ablation, spanning
+synthetic ground truth to 22M real cells. (2) A leakage-audited, well-powered statistical protocol
+(train-only data-derived GRNs, cluster bootstrap over drugs/cell-lines, Holm correction, deterministic
+fp32 eval) that caught and fixed three result-invalidating bugs. (3) The central finding: **no GRN
+prior — generic, weighted, or data-derived — significantly improves real-data OOD prediction**, and on
+synthetic data we localize *why* (redundant for shared targets, insufficient for novel ones). (4) Under
+the same protocol, **the deep PathwayMoE architecture itself does not beat the linear baselines** on
+real OOD (it loses to ridge on unseen_cell_line and ties the mean-effect baseline on unseen_both),
+reinforcing the foundation-model result. (5) A typed, tested, leakage-audited benchmarking package
+(`pmoe/`) for reproducible follow-up.
 
 ## 2. Methods
 
@@ -108,6 +141,9 @@ the linear baselines (0.58–0.61) but with heavily overlapping cluster CIs (MoE
 B1 0.608 [0.546,0.664]) — not a significant win; and the **GRN attention mask contributes nothing
 measurable, at any quality level**.
 (GRN-propagation baseline: N/A here — Tahoe lacks per-row drug→target labels to seed it.)
+This null is visualized per regime in **`fig_grn_study_tahoe_full_v2.png`**, and summarized across all
+three regimes (real Tahoe, synthetic shared- and novel-target) in the headline
+**`fig_money_grn_effect.png`**.
 
 ### 3.1b The deep model does not beat linear baselines on the harder OOD splits
 Re-running the two harder OOD splits under the same leakage-free protocol (variant=none, 3 seeds,
@@ -123,7 +159,8 @@ On unseen_cell_line the 45M-param model **loses significantly to ridge**; on uns
 sits slightly below) the trivial mean-effect baseline. The earlier "wins" were an artifact of
 corrupted-low V1 baselines (0.43/0.32 → 0.85/0.61 once HVG-selection leakage is removed). Thus, on
 real Tahoe OOD, **neither the GRN prior nor the deep architecture itself confers a robust advantage
-over linear baselines** — strengthening, not weakening, the paper's thesis.
+over linear baselines** — strengthening, not weakening, the paper's thesis. See
+**`fig_comparison_tahoe.png`** (baselines vs PathwayMoE across the three OOD splits, cluster CIs).
 
 ### 3.2 Synthetic, shared-target regime — GRN is redundant
 Synthetic data whose generative process *is* GRN propagation, where drug classes share target hubs
@@ -208,9 +245,11 @@ regime, so we cannot confirm a GRN benefit at p<0.05 even where one is plausible
 
 ## 6. Reproducibility & availability
 Code: the typed `pmoe/` package (`experiments/{study,mechanism,train}.py`, `priors/grn.py`,
-`eval/{metrics,stats,loading,report}.py`) + `reproduce.ps1`; 43 tests incl. a leakage regression test.
+`eval/{metrics,stats,loading,report}.py`) + `reproduce.ps1`; 44 tests incl. a leakage regression test.
 Split seed fixed (identical test set across variants/seeds); 3 model seeds; deterministic fp32 eval;
 cluster-bootstrap 95% CIs + Holm correction. Each checkpoint stores an env+data provenance manifest
 (library versions, gene-list hash, shard count). Results: `results/study_*_v2.json`,
-`mechanism_*.json`, figures `results/fig_grn_study_*_v2.png`. Real data = 803/3,388 Tahoe-100M shards
-(22.66M cells) on `E:\vc_project_data`; rebuild via `code/preprocess_tahoe_stream.py`.
+`mechanism_*.json`, the OOD-baseline audit `results/REAL_TAHOE_OOD_AUDIT.md`; figures
+`results/fig_grn_study_*_v2.png`, `fig_money_grn_effect.png`, `fig_comparison_tahoe.png`. Real data =
+803/3,388 Tahoe-100M shards (22.66M cells) on `E:\vc_project_data`; rebuild via
+`code/preprocess_tahoe_stream.py`. The OOD-split re-run used batch 48 (batch 96 exhausts 24 GB VRAM).
