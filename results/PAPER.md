@@ -15,7 +15,11 @@ We run this on (i) a 22.6M-cell, 8,875-condition subset of Tahoe-100M with deep 
 (ii) synthetic data whose generative process *is* GRN propagation, in two regimes (targets shared
 with vs. held out from training). **Result:** with leakage-free GRNs and cluster-bootstrap statistics,
 **no GRN prior — generic, weighted, or data-derived — significantly improves real-data OOD prediction**
-(all |Δ DEG-Pearson|≤0.007, Holm-p>0.1), although the deep model beats linear baselines. On synthetic
+(all |Δ DEG-Pearson|≤0.007, Holm-p>0.1). Moreover, under the same leakage-free protocol the deep
+PathwayMoE does **not** robustly beat the linear baselines either: across three OOD splits it loses
+to ridge on unseen_cell_line (0.824 vs 0.868, p<0.001), ties the mean-effect baseline on unseen_both
+(0.581 vs 0.607, ns), and shows only a small non-significant edge on unseen_drug (0.630 vs 0.608,
+overlapping CIs). On synthetic
 data we localize why: when test perturbations **share targets** with training, even the *true* GRN is
 redundant (the model learns the response directly, true GRN +0.014, ns); when targets are **novel**,
 the true GRN gives a meaningful but **non-significant** gain (Δ≈+0.06, p≈0.80) in a regime that is
@@ -99,9 +103,27 @@ DEG-Pearson@50 with **cluster-bootstrap** 95% CIs (resampling drugs). 3 seeds pe
 Planned contrasts (paired cluster bootstrap, Holm-corrected): **every** GRN variant vs none is within
 ±0.007 with Holm-p > 0.1 — none significant, none meaningful (|Δ|≥0.01). Notably the data-derived
 co-response GRN — the variant a leaky analysis would have favoured — is Δ = **−0.005 (p=0.52)** vs none
-and −0.003 (p=0.74) vs TRRUST. The deep MoE (~0.63) beats the linear baselines (0.58–0.61), but the
-**GRN attention mask contributes nothing measurable, at any quality level**.
+and −0.003 (p=0.74) vs TRRUST. On unseen_drug the deep MoE (~0.63) shows a small numerical edge over
+the linear baselines (0.58–0.61) but with heavily overlapping cluster CIs (MoE 0.630 [0.552,0.700] vs
+B1 0.608 [0.546,0.664]) — not a significant win; and the **GRN attention mask contributes nothing
+measurable, at any quality level**.
 (GRN-propagation baseline: N/A here — Tahoe lacks per-row drug→target labels to seed it.)
+
+### 3.1b The deep model does not beat linear baselines on the harder OOD splits
+Re-running the two harder OOD splits under the same leakage-free protocol (variant=none, 3 seeds,
+deterministic fp32 eval, cluster bootstrap; `results/REAL_TAHOE_OOD_AUDIT.md`) overturns an earlier
+(V1, HVG-leakage-tainted) comparison that had reported large PathwayMoE wins:
+
+| split | clusters | B1 mean-effect | B2 ridge | PathwayMoE | MoE vs best baseline |
+|---|---|---|---|---|---|
+| unseen_cell_line | 10 | 0.850 | **0.868** | 0.824 | **−0.044 vs ridge, p<0.001 (sig & meaningful)** |
+| unseen_both | 33 | **0.607** | 0.390 | 0.581 | −0.026 vs mean-effect, p=0.47 (ns) |
+
+On unseen_cell_line the 45M-param model **loses significantly to ridge**; on unseen_both it ties (and
+sits slightly below) the trivial mean-effect baseline. The earlier "wins" were an artifact of
+corrupted-low V1 baselines (0.43/0.32 → 0.85/0.61 once HVG-selection leakage is removed). Thus, on
+real Tahoe OOD, **neither the GRN prior nor the deep architecture itself confers a robust advantage
+over linear baselines** — strengthening, not weakening, the paper's thesis.
 
 ### 3.2 Synthetic, shared-target regime — GRN is redundant
 Synthetic data whose generative process *is* GRN propagation, where drug classes share target hubs
@@ -152,7 +174,8 @@ significant. Independent of injection mechanism.
 Across a real 22.6M-cell benchmark and two synthetic regimes with known ground-truth GRNs, a
 GRN-structured attention mask provides **no robust, specific benefit** for OOD perturbation prediction:
 - On **real Tahoe-100M**, no GRN variant — generic (TRRUST), weighted, or train-only data-derived —
-  beats no-GRN (all |Δ|≤0.007, Holm-p>0.1), even though the deep MoE beats linear baselines.
+  beats no-GRN (all |Δ|≤0.007, Holm-p>0.1); and under the same protocol the deep MoE does not beat
+  the linear baselines either (loses to ridge on unseen_cell_line, ties mean-effect on unseen_both).
 - On **synthetic shared-target** data, even the *true* GRN is redundant: with targets seen in training,
   the model learns the perturbation response directly.
 - On **synthetic novel-target** data, where the GRN is in principle essential, the true GRN gives a

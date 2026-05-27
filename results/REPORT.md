@@ -1,3 +1,12 @@
+> ⚠️ **SUPERSEDED (V1, 2026-05-22) — DO NOT CITE for real-data claims.** This pre-dates the V2
+> leakage audit. Its central real-data claim — "PathwayMoE wins clearly on the harder cell-line
+> splits (unseen_cell_line 0.551 vs 0.432; unseen_both 0.512 vs 0.324)" — is **false**: those came
+> from a pipeline with HVG-selection leakage and corrupted-low baselines. Under the leakage-free
+> protocol the baselines are ~2× higher and the deep model loses to ridge on unseen_cell_line
+> (0.824 vs 0.868, p<0.001) and ties mean-effect on unseen_both. The canonical, corrected results
+> are in **`PAPER.md`** and **`REAL_TAHOE_OOD_AUDIT.md`**. (The synthetic-data results below are
+> not part of the leakage audit and are reported as-is.)
+
 # PathwayMoE-Perturb — Results Report
 
 *Run: 2026-05-22/23 · RTX 4090 (24 GB), i9-14900KF, 128 GB RAM · native Windows + PyTorch SDPA*
