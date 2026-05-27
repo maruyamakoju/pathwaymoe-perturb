@@ -71,28 +71,28 @@ reinforcing the foundation-model result. (5) A typed, tested, leakage-audited be
 (`pmoe/`) for reproducible follow-up.
 
 ## 1.1 Related work
-*(Citations are marked `[CITE: …]` placeholders — fill with the venue's reference style.)*
 
 **Single-cell perturbation prediction and the linear-baseline gap.** Large single-cell foundation
 models (e.g. transformer pretraining over millions of cells) were proposed to transfer to perturbation
 response, but a 2025 benchmark found they do not outperform simple linear baselines on OOD splits
-[CITE: Nature Methods 2025 foundation-model perturbation benchmark; Ahlmann-Eltze et al.-style linear
-baseline critique]. This motivates the question of what inductive bias, if any, closes the gap.
+(Ahlmann-Eltze et al., *Nature Methods* 2025). This motivates the question of what inductive bias, if
+any, closes the gap.
 
 **Biology-structured inductive biases.** A prominent line injects gene-regulatory structure:
-GEARS propagates perturbation signal over a GRN/GO graph [CITE: GEARS, Roohani et al.]; scGPT and
-related models add pathway/GRN attention or tokens [CITE: scGPT; GenePT]; and pathway Mixture-of-
-Experts route computation by curated gene sets [CITE: pathway-MoE / Reactome-routed models]. Curated
-networks (TRRUST [CITE: TRRUST v2], DoRothEA/CollecTRI [CITE: DoRothEA, CollecTRI]) and data-derived
+GEARS propagates perturbation signal over a GRN/GO graph (Roohani et al., *Nat. Biotechnol.* 2024);
+scGPT and related models add pathway/GRN attention or tokens (Cui et al., *Nat. Methods* 2024; Chen &
+Zou, *Nat. Biomed. Eng.* 2025); and pathway Mixture-of-Experts route computation by curated gene sets
+(Lotfollahi et al., *Nat. Cell Biol.* 2023). Curated networks (TRRUST; Han et al., *NAR* 2018;
+DoRothEA/CollecTRI; Garcia-Alonso et al., 2019; Müller-Dott et al., *NAR* 2023) and data-derived
 co-expression graphs are the usual priors. Most reports show a gain from *adding* such structure but do
 not isolate it from the surrounding architecture, nor vary GRN *quality* as a controlled variable.
 
 **Evaluation pitfalls in single-cell ML.** Recent critiques highlight leakage and weak baselines:
 test-aware feature/graph construction, condition-level dependence ignored by naive bootstrap, and
-metrics dominated by easy genes [CITE: single-cell benchmarking-rigor / data-leakage critiques]. Our
-protocol (train-only data-derived GRNs, cluster bootstrap over drugs/cell-lines, Holm correction, a
-pre-registered minimum effect, deterministic eval) is designed against exactly these failure modes; we
-report three concrete bugs that, uncaught, would each have produced a confident false positive.
+metrics dominated by easy genes (Peidli et al., *Nat. Methods* 2024). Our protocol (train-only
+data-derived GRNs, cluster bootstrap over drugs/cell-lines, Holm correction, a pre-registered minimum
+effect, deterministic eval) is designed against exactly these failure modes; we report three concrete
+bugs that, uncaught, would each have produced a confident false positive.
 
 **Our position.** Rather than ask "does biology help?", we hold the architecture fixed and ask whether
 GRN *quality* moves OOD accuracy — and, separately, whether the deep architecture beats linear baselines
@@ -163,8 +163,8 @@ DEG-Pearson@50 with **cluster-bootstrap** 95% CIs (resampling drugs). 3 seeds pe
 
 Planned contrasts (paired cluster bootstrap, Holm-corrected): **every** GRN variant vs none is within
 ±0.007 with Holm-p > 0.1 — none significant, none meaningful (|Δ|≥0.01). Notably the data-derived
-co-response GRN — the variant a leaky analysis would have favoured — is Δ = **−0.005 (p=0.52)** vs none
-and −0.003 (p=0.74) vs TRRUST. On unseen_drug the deep MoE (~0.63) shows a small numerical edge over
+co-response GRN — the variant a leaky analysis would have favoured — is Δ = **−0.005 (p=0.60)** vs none
+and −0.002 (p=0.94) vs TRRUST. On unseen_drug the deep MoE (~0.63) shows a small numerical edge over
 the linear baselines (0.58–0.61) but with heavily overlapping cluster CIs (MoE 0.630 [0.552,0.700] vs
 B1 0.608 [0.546,0.664]) — not a significant win; and the **GRN attention mask contributes nothing
 measurable, at any quality level**.
