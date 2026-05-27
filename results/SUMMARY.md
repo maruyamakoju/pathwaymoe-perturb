@@ -17,7 +17,7 @@ mechanism?** We hold a fixed model (a pathway Mixture-of-Experts with gene-token
 - **No leakage**: data-derived GRNs built from *training conditions only*, per split (regression-tested).
 - **Cluster bootstrap** over drugs/cell-lines (the real independent units) + Holm correction +
   pre-registered minimum meaningful effect (0.01); deterministic fp32 eval; headline re-verified by
-  direct recompute. 43 tests. Data: 22.66M-cell Tahoe-100M subset (8,875 conditions × 2,000 HVGs).
+  direct recompute. 44 tests. Data: 22.66M-cell Tahoe-100M subset (8,875 conditions × 2,000 HVGs).
 
 ## Result
 ![GRN effect across regimes](fig_money_grn_effect.png)
@@ -33,6 +33,11 @@ data-derived, or even the **ground-truth** GRN — confers **no significant bene
 learns the perturbation response directly, so the structural prior is **redundant**. The true GRN only
 *hints* at helping for **novel targets** (+0.06), a near-unpredictable regime where the effect is not
 significant. The **injection mechanism does not matter** (mask ≈ message-passing).
+
+Under the same leakage-free protocol, the deep PathwayMoE **does not beat the linear baselines** on
+real OOD either — it loses to ridge on unseen_cell_line (0.824 vs 0.868, p<0.001) and ties the
+mean-effect baseline on unseen_both (a prior V1 comparison reporting large wins was an HVG-leakage
+artifact; see `REAL_TAHOE_OOD_AUDIT.md`). So neither the GRN prior nor the architecture helps here.
 
 ## Why it matters / caveats
 The contribution is (1) evidence that GRN-as-prior is redundant in the realistic regime, isolating
