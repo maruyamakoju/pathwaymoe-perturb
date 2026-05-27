@@ -6,13 +6,21 @@ import torch.nn.functional as F
 
 from pmoe.config import ModelConfig
 from pmoe.models import MixedAttention, MoEFFN, PathwayMoEPerturb, count_params
+from pmoe.experiments.train import make_hierarchical_config
 
 
 def _tiny_cfg(**kw) -> ModelConfig:
-    base = dict(n_genes=60, d_model=32, n_layers=2, n_experts=6, n_heads=4, chemberta_dim=16,
-                d_pert=32)
+    # Use the helper to build a hierarchical config
+    base = dict(
+        dataset="synthetic",
+        size="tiny",
+        variant="none",
+        n_genes=60,
+        n_experts=6,
+        cb_dim=16,
+    )
     base.update(kw)
-    return ModelConfig(**base)
+    return make_hierarchical_config(**base)
 
 
 def _rand_batch(cfg: ModelConfig, B: int = 4) -> dict:
@@ -47,7 +55,7 @@ def test_forward_shape_and_finite_grads():
         gp[g, rng.integers(0, cfg.n_experts + 2)] = True
     model = PathwayMoEPerturb(cfg, sp.csr_matrix(_bool_grn(N)), gp).train()
     batch = _rand_batch(cfg, B=5)
-    pred = model(batch)
+    pred = model(**batch)
     assert pred.shape == (5, 60)
     assert torch.isfinite(pred).all()
 
@@ -63,28 +71,28 @@ def test_aux_loss_positive_in_train_mode():
     torch.manual_seed(0)
     cfg = _tiny_cfg()
     model = PathwayMoEPerturb(cfg, _bool_grn(cfg.n_genes)).train()
-    _ = model(_rand_batch(cfg))
+    _ = model(**_rand_batch(cfg))
     assert float(model.aux_loss()) > 0.0
 
 
 def test_weighted_and_binary_grn_both_run():
     torch.manual_seed(0)
     N = 60
-    # binary (bool) GRN, weighted_grn=False
-    cfg_b = _tiny_cfg(weighted_grn=False)
+    # binary (bool) GRN, variant="trrust" will trigger use_grn_mask=True in helper
+    cfg_b = _tiny_cfg(variant="trrust")
     m_b = PathwayMoEPerturb(cfg_b, _bool_grn(N)).eval()
-    out_b = m_b(_rand_batch(cfg_b))
+    out_b = m_b(**_rand_batch(cfg_b))
     assert out_b.shape == (4, 60) and torch.isfinite(out_b).all()
 
-    # weighted (float scipy sparse) GRN, weighted_grn=True
-    cfg_w = _tiny_cfg(weighted_grn=True)
+    # weighted (float scipy sparse) GRN
+    cfg_w = _tiny_cfg(variant="trrust_weighted")
     m_w = PathwayMoEPerturb(cfg_w, _float_grn(N)).eval()
     # the weighted bias must be finite on allowed edges, -inf only on absent ones
     gb = m_w.grn_bias.numpy()
     finite = np.isfinite(gb)
     assert finite.any() and (gb[finite] >= 0).all()           # non-negative finite bias
     assert np.isneginf(gb).any()                              # absent edges masked
-    out_w = m_w(_rand_batch(cfg_w))
+    out_w = m_w(**_rand_batch(cfg_w))
     assert out_w.shape == (4, 60) and torch.isfinite(out_w).all()
 
 

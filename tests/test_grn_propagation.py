@@ -9,16 +9,19 @@ import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
 
-from pmoe.config import ModelConfig
+from pmoe.config import (ArchitectureConfig, GRNConfig, ModelConfig, MoEConfig,
+                         PerturbationConfig)
 from pmoe.models import PathwayMoEPerturb
 from pmoe.models.layers import GRNPropagation
 
 
-def _cfg(**kw) -> ModelConfig:
-    base = dict(n_genes=40, d_model=32, n_layers=2, n_experts=4, n_heads=4, chemberta_dim=16,
-                d_pert=32)
-    base.update(kw)
-    return ModelConfig(**base)
+def _cfg(grn_propagation: bool = False, latent_grn: bool = False) -> ModelConfig:
+    return ModelConfig(
+        arch=ArchitectureConfig(n_genes=40, d_model=32, n_heads=4, n_layers=2),
+        pert=PerturbationConfig(d_pert=32, chemberta_dim=16),
+        grn=GRNConfig(grn_propagation=grn_propagation, latent_grn=latent_grn),
+        moe=MoEConfig(n_experts=4),
+    )
 
 
 def _rand_batch(cfg: ModelConfig, B: int = 4) -> dict:
@@ -44,7 +47,7 @@ def test_propagation_forward_shape_and_finite_grads():
     model = PathwayMoEPerturb(cfg, _sparse_grn(cfg.n_genes)).train()
     assert model.grn_prop is not None
     batch = _rand_batch(cfg, B=5)
-    pred = model(batch)
+    pred = model(**batch)
     assert pred.shape == (5, 40)
     assert torch.isfinite(pred).all()
 
@@ -74,8 +77,8 @@ def test_propagation_changes_prediction():
 
     batch = _rand_batch(_cfg(), B=4)
     with torch.no_grad():
-        out_off = m_off(batch)
-        out_on = m_on(batch)
+        out_off = m_off(**batch)
+        out_on = m_on(**batch)
     assert out_on.shape == out_off.shape
     assert torch.isfinite(out_on).all()
     assert not torch.allclose(out_on, out_off)

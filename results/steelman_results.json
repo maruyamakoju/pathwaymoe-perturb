@@ -1,0 +1,18 @@
+{
+  "nogrn": {
+    "name": "synthetic_hard_v2__unseen_drug__small__none__steel_nogrn",
+    "best_val_deg50": 0.4738031750193759
+  },
+  "gateonly": {
+    "name": "synthetic_hard_v2__unseen_drug__small__ground_truth__steel_gateonly",
+    "best_val_deg50": 0.45423744057096876
+  },
+  "gateonly_lowkl": {
+    "name": "synthetic_hard_v2__unseen_drug__small__ground_truth__steel_gateonly_lowkl",
+    "best_val_deg50": 0.4719401380960509
+  },
+  "static": {
+    "name": "synthetic_hard_v2__unseen_drug__small__ground_truth__steel_static",
+    "best_val_deg50": 0.49105598146691176
+  }
+}

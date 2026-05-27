@@ -1,0 +1,56 @@
+{
+  "run": "synthetic_hard_v2__unseen_drug__small__ground_truth__long_latent",
+  "n_genes": 2000,
+  "panel": [
+    "trametinib",
+    "nutlin-3",
+    "syn0070",
+    "syn0072",
+    "syn0041",
+    "syn0024",
+    "givinostat",
+    "gefitinib",
+    "dabrafenib",
+    "tunicamycin",
+    "bortezomib",
+    "sorafenib"
+  ],
+  "saturation": {
+    "drug": "trametinib",
+    "mean": 0.5000350475311279,
+    "std": 0.0016000146279111505,
+    "frac_gt_0.8": 0.0,
+    "frac_gt_0.5": 0.5045025,
+    "frac_lt_0.2": 0.0,
+    "pctile": {
+      "1": 0.495732843875885,
+      "25": 0.4995323121547699,
+      "50": 0.500007688999176,
+      "75": 0.5004922747612,
+      "99": 0.5042532086372375
+    }
+  },
+  "specificity": {
+    "mean_across_drug_std_per_edge": 0.0007669405895285308,
+    "within_drug_spatial_std": 0.0009780602995306253,
+    "specificity_ratio_across_over_within": 0.7841444838446504,
+    "overall_gate_std": 0.0010335600236430764,
+    "tram_vs_nutlin_mean_abs_diff": 0.0010271676583215594
+  },
+  "noise_vs_signal": {
+    "_note": "sampling_std measured with LRI forced to train() (eps on); quantifies how noisy the ORIGINAL buggy eval-time extraction was vs real across-drug signal.",
+    "sampling_std_mean": 0.23996585607528687,
+    "across_drug_std_mean": 0.0007669405895285308,
+    "ratio_signal_over_noise": 0.00319604047871175
+  },
+  "rank1_confound": {
+    "unique_targets_in_top100": 2,
+    "unique_sources_in_top100": 99,
+    "frac_top_edges_into_top10_receptivity_genes": 1.0
+  },
+  "VERDICT": [
+    "NON-SPECIFIC: across-drug std=0.0008 ~ gate barely moves with drug",
+    "NOISE-DOMINATED: signal/noise=0.00 -> 'edges' ~ sampling noise",
+    "RANK-1 CONFOUND: top edges are just high-receptivity hub columns"
+  ]
+}

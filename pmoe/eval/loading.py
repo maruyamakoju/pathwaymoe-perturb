@@ -19,25 +19,44 @@ from pmoe.io import load_checkpoint
 
 
 def load_model_for_eval(run: RunSpec, dataset: str, variant, split, device):
-    """Reconstruct the trained model from its checkpoint with the CORRECT GRN reloaded.
-
-    Reconstructs ``ModelConfig`` from the checkpoint, loads the matching pathway prior, reloads
-    the ``variant``/``split``-specific GRN via :func:`pmoe.priors.grn.load_grn` (the fix for the
-    non-persistent ``grn_bias`` buffer bug), then loads the state dict in eval mode.
-    """
+    """Reconstruct the trained model from its checkpoint with the CORRECT GRN reloaded."""
     from pmoe.models import PathwayMoEPerturb
     from pmoe.priors.grn import load_grn
     from pmoe.priors.pathways import load_pathways
+    from pmoe.experiments.train import make_hierarchical_config
 
     ck = load_checkpoint(run.ckpt_path, map_location=device)
-    cfg = ModelConfig(**ck["cfg"])
+    raw_cfg = ck["cfg"]
+    
+    # Handle both old flat configs and new hierarchical configs
+    if "arch" in raw_cfg:
+        # New hierarchical config
+        from pmoe.config import ArchitectureConfig, PerturbationConfig, GRNConfig, MoEConfig
+        cfg = ModelConfig(
+            arch=ArchitectureConfig(**raw_cfg["arch"]),
+            pert=PerturbationConfig(**raw_cfg["pert"]),
+            grn=GRNConfig(**raw_cfg["grn"]),
+            moe=MoEConfig(**raw_cfg["moe"])
+        )
+    else:
+        # Old flat config - reconstruct using the helper
+        # We need cb_dim which might be in shared or extra. 
+        # For eval loading, we just need to reconstruct the ModelConfig object.
+        cfg = make_hierarchical_config(
+            dataset=dataset,
+            size=run.size,
+            variant=variant,
+            n_genes=raw_cfg.get("n_genes", 2000),
+            n_experts=raw_cfg.get("n_experts", 40),
+            cb_dim=raw_cfg.get("chemberta_dim", 384),
+            grn_propagation=raw_cfg.get("grn_propagation", False),
+            use_grn_mask=raw_cfg.get("use_grn_mask", True)
+        )
 
-    # Reload the CORRECT GRN variant for this split (None for the 'none' variant / missing file).
     grn = load_grn(dataset, variant, split)
 
-    # Pathway prior is variant-independent; tolerate absence.
     try:
-        gene_pathway, _names = load_pathways(dataset)
+        gene_pathway, _ = load_pathways(dataset)
     except Exception:
         gene_pathway = None
 
@@ -54,11 +73,11 @@ def predict_test(run: RunSpec, dataset: str, df, shared: dict, test_idx: np.ndar
 
     model = load_model_for_eval(run, dataset, variant, split, device)
     loader = make_loader(dataset, test_idx, df, shared, batch_size=16, shuffle=False)
-    # fp32 (no bf16 autocast) for DETERMINISTIC, reproducible eval metrics. bf16 autocast made the
-    # point estimate run-to-run unstable on near-zero-variance tasks (per-condition DEG-Pearson ~0).
+    
     preds = []
     with torch.no_grad():
         for batch in loader:
             b = {k: (v.to(device) if torch.is_tensor(v) else v) for k, v in batch.items()}
-            preds.append(model(b).float().cpu().numpy())
+            # Use **b to match the new forward signature
+            preds.append(model(**b).float().cpu().numpy())
     return np.concatenate(preds)

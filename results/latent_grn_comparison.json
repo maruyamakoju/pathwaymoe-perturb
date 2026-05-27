@@ -1,0 +1,11 @@
+{
+  "static": {
+    "name": "synthetic_hard_v2__unseen_drug__small__ground_truth__static_baseline",
+    "best_val_deg50": 0.443053750604345
+  },
+  "latent": {
+    "name": "synthetic_hard_v2__unseen_drug__small__ground_truth__latent_grn",
+    "best_val_deg50": 0.43849154363867315
+  },
+  "delta": -0.004562206965671833
+}
