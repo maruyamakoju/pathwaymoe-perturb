@@ -1,7 +1,5 @@
-% Submission draft generated from results/PAPER.md (the canonical content source).
-% Venue-agnostic article class so it compiles anywhere; swap in the venue style later.
+% arXiv / bioRxiv preprint. Canonical content source: results/PAPER.md.
 % Build: pdflatex paper && bibtex paper && pdflatex paper && pdflatex paper
-% NOTE: \cite keys point to references.bib STUB entries — replace with real references.
 \documentclass[11pt]{article}
 
 \usepackage[utf8]{inputenc}
@@ -19,6 +17,9 @@
 
 \title{When does gene-regulatory structure help perturbation prediction?\\
 A controlled study from synthetic ground truth to 22M real cells}
+% TODO: Fill in author name(s) and affiliation(s) before submission.
+% Example:
+% \author{Koju Maruyama \\ Affiliation \\ \texttt{email@example.com}}
 \author{\todo{Authors / affiliations}}
 \date{\today}
 
@@ -294,6 +295,17 @@ The typed \texttt{pmoe/} package (\texttt{experiments/\{study,mechanism,train\}.
 cluster-bootstrap 95\% CIs $+$ Holm correction. Each checkpoint stores an env+data provenance manifest.
 Real data $=$ 803/3{,}388 Tahoe-100M shards (22.66M cells). The OOD-split re-run used batch 48 (batch 96
 exhausts 24\,GB VRAM).
+
+\paragraph{Code \& data.}
+Code is available at \url{https://github.com/maruyamakoju/pathwaymoe-perturb}.
+The real data subset (22.66M cells from Tahoe-100M) can be rebuilt from the public Tahoe-100M release
+using \texttt{code/preprocess\_tahoe\_stream.py}.
+
+\section*{Acknowledgements}
+Parts of this work, including code development, the leakage audit, and the statistical analysis
+pipeline, were developed with the assistance of AI coding tools (Claude, Gemini). All results were
+independently verified by the authors; numerical claims were cross-checked against source data files.
+Computational experiments were run on a single NVIDIA RTX~4090 (24\,GB VRAM).
 
 \bibliographystyle{plain}
 \bibliography{references}
