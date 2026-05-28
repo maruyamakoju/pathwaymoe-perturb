@@ -55,16 +55,41 @@ def test_ground_truth_roundtrips(tmp_path, monkeypatch):
     assert loaded is not None and (loaded != m).nnz == 0
 
 
-def test_trrust_weighted_is_signed_float():
-    genes = _genes(80)
+def test_trrust_weighted_is_signed_float(tmp_path, monkeypatch):
+    """trrust_weighted must produce a float CSR with BOTH positive (Activation) and negative
+    (Repression) weights -- not just "any non-zero", which the previous assertion allowed.
+
+    We mock the TRRUST file and the symbol->Ensembl vocab so the test is hermetic (doesn't
+    depend on E:\\vc_project_data files).
+    """
+    genes = [f"ENSG{i:08d}" for i in range(20)]
+    # Fixture TRRUST: A->B Activation, C->D Repression, E->F Unknown.
+    trrust_text = "\n".join([
+        "GENEA\tGENEB\tActivation\tpmid1",
+        "GENEC\tGENED\tRepression\tpmid2",
+        "GENEE\tGENEF\tUnknown\tpmid3",
+    ]) + "\n"
+    vocab_text = "\n".join([
+        '{"gene_symbol":"GENEA","ensembl_id":"ENSG00000000"}',
+        '{"gene_symbol":"GENEB","ensembl_id":"ENSG00000001"}',
+        '{"gene_symbol":"GENEC","ensembl_id":"ENSG00000002"}',
+        '{"gene_symbol":"GENED","ensembl_id":"ENSG00000003"}',
+        '{"gene_symbol":"GENEE","ensembl_id":"ENSG00000004"}',
+        '{"gene_symbol":"GENEF","ensembl_id":"ENSG00000005"}',
+    ]) + "\n"
+    trrust_path = tmp_path / "trrust_human.tsv"; trrust_path.write_text(trrust_text)
+    vocab_path = tmp_path / "gene_vocabulary.jsonl"; vocab_path.write_text(vocab_text)
+
+    import pmoe.priors.grn as grn_mod
+    monkeypatch.setattr(grn_mod, "TRRUST_TSV", trrust_path)
+    monkeypatch.setattr(grn_mod, "VOCAB", vocab_path)
+
     m = build_grn("synthetic_smoke", GRNVariant.TRRUST_WEIGHTED, genes=genes)
-    assert m.dtype != bool, "weighted GRN must be float"
-    assert np.issubdtype(m.dtype, np.floating)
-    if m.nnz:
-        data = m.data
-        assert (data < 0).any() or (data > 0).any()
-        # signed: at least some negatives expected from Repression / Unknown
-        # (don't hard-require negatives if the tiny gene slice happened to map none)
+    assert np.issubdtype(m.dtype, np.floating), "weighted GRN must be float"
+    assert m.nnz == 3, f"expected exactly 3 TRRUST edges, got {m.nnz}"
+    data = m.data
+    assert (data > 0).any(), "Activation edge should produce a positive weight"
+    assert (data < 0).any(), "Repression edge should produce a negative weight"
 
 
 def test_none_is_empty():

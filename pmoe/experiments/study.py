@@ -29,16 +29,13 @@ from pmoe.io import data_manifest
 
 def ensure_static_priors(dataset):
     """Build the priors that do NOT depend on the split (pathways, drugs, non-data-derived GRNs)."""
-    pd = __import__("pmoe.priors.pathways", fromlist=["load_pathways"])
     try:
         load_pathways(dataset)
-    except Exception:
+    except FileNotFoundError:
         build_pathways(dataset)
     load_drug_feats(dataset)
     for v in [GRNVariant.RANDOM, GRNVariant.TRRUST, GRNVariant.TRRUST_WEIGHTED]:
-        try:
-            load_grn(dataset, v)
-        except Exception:
+        if load_grn(dataset, v) is None:
             build_grn(dataset, v)
     # ground_truth only if a base grn_mask exists (synthetic). Check the FILE (load_grn returns
     # None for a missing file rather than raising, so a try/except would silently skip the build).

@@ -23,3 +23,8 @@ package = false
 pythonpath = ["."]
 addopts = "-q"
 testpaths = ["tests"]
+markers = [
+  "slow: end-to-end or data-dependent tests",
+  "needs_e_drive: requires E:\\vc_project_data data root",
+  "gpu: requires a CUDA device",
+]

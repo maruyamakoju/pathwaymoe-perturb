@@ -68,6 +68,34 @@ def test_coexpr_lfc_ignores_test_rows():
     )
 
 
+def test_coexpr_ignores_test_rows():
+    """Same regression as COEXPR_LFC but for the COEXPR variant, which keys off
+    ``pert_mean`` instead of ``lfc`` -- a refactor that swapped the columns silently
+    would pass the LFC-only test below but fail here."""
+    genes = [f"G{i:05d}" for i in range(N_GENES)]
+    df = _fake_df(seed=3)
+
+    idx = np.arange(N_COND)
+    train_idx = idx[: int(N_COND * 0.6)]
+    test_idx = idx[int(N_COND * 0.6):]
+
+    m1 = build_grn(DATASET, GRNVariant.COEXPR, train_idx=train_idx, df=df,
+                   genes=genes, split="unseen_drug")
+    edges_before = _edge_set(m1)
+    assert edges_before, "expected a non-empty coexpr GRN"
+
+    df2 = df.copy()
+    big = np.arange(N_GENES, dtype=np.float32) * 1000.0 + 12345.0
+    for t in test_idx:
+        df2.at[t, "pert_mean"] = big.copy() * (1 + t)
+
+    m2 = build_grn(DATASET, GRNVariant.COEXPR, train_idx=train_idx, df=df2,
+                   genes=genes, split="unseen_drug")
+    edges_after = _edge_set(m2)
+
+    assert edges_after == edges_before, "COEXPR GRN changed after mutating test rows!"
+
+
 def test_coexpr_train_idx_none_raises():
     genes = [f"G{i:05d}" for i in range(N_GENES)]
     df = _fake_df(seed=2)

@@ -7,7 +7,7 @@ All layers are designed for high-performance and memory efficiency at genomic sc
 from __future__ import annotations
 
 import math
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import numpy as np
 import scipy.sparse as sp
