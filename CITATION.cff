@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software or the associated study, please cite the paper below."
+title: "PathwayMoE-Perturb: When does gene-regulatory structure help perturbation prediction?"
+abstract: >-
+  A leakage-audited, statistically rigorous controlled study of whether a
+  gene-regulatory-network (GRN) inductive bias improves out-of-distribution
+  single-cell perturbation prediction. The architecture is held fixed; only GRN
+  quality (none / random / TRRUST curated / data-derived co-expression /
+  co-response / ground-truth) and injection mechanism (hard attention mask vs
+  soft message-passing) are varied. Evaluated on a 22.6M-cell Tahoe-100M subset
+  and on synthetic data with known generative GRN. Headline result: no GRN
+  prior significantly improves real-data OOD prediction.
+type: software
+authors:
+  - family-names: Maruyama
+    given-names: Koju
+    email: 07013464848maru@gmail.com
+repository-code: "https://github.com/maruyamakoju/pathwaymoe-perturb"
+keywords:
+  - single-cell perturbation prediction
+  - gene regulatory network
+  - mixture of experts
+  - out-of-distribution generalization
+  - inductive bias
+  - Tahoe-100M
+license: MIT
+version: "0.1.0"
+date-released: 2026-05-28
+preferred-citation:
+  type: article
+  title: "When does gene-regulatory structure help perturbation prediction? A controlled study from synthetic ground truth to 22M real cells"
+  authors:
+    - family-names: Maruyama
+      given-names: Koju
+  year: 2026
+  # TODO: replace with arXiv / bioRxiv DOI once preprint is uploaded.
+  # doi: "10.48550/arXiv.XXXX.XXXXX"
+  notes: "Preprint; arXiv/bioRxiv DOI pending upload."

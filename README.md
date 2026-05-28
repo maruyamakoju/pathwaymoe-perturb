@@ -89,3 +89,8 @@ See `reproduce.ps1` for the end-to-end script.
 Native Windows + RTX 4090. Real data = 803/3388 Tahoe-100M shards (22.66M cells → 8,875 conditions ×
 2,000 HVGs, mean 2,480 cells/condition, matched DMSO controls). This is a research artifact, not a
 package release; the conclusion (GRN-as-prior is redundant where prediction is feasible) is robust.
+
+## License & citation
+
+MIT-licensed (see `LICENSE`). If you use the code or the study, citation metadata is in
+`CITATION.cff`; the preprint DOI will be added once the arXiv/bioRxiv upload is live.
