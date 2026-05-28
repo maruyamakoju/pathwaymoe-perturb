@@ -93,3 +93,40 @@ audit + tests + direct-recompute verification, i.e. the engineering rigor itself
 
 The v1 grid currently running is retained only as a **preliminary, partly-leaky sanity baseline**;
 all headline numbers will come from the v2 leakage-free, cluster-bootstrapped pipeline.
+
+## L. Mechanism (synthetic_hard_big) DEG50 was bf16-nondeterminism, not deterministic fp32 (2026-05-28)
+
+During the publication-quality sprint we re-analyzed every checkpoint with the corrected stats
+(`+1/(B+1)` continuity correction; see item M below). For Tahoe-100M the numbers reproduced within
+±0.001. For the synthetic_hard_big mechanism study the numbers shifted notably:
+
+| Run                                | none  | gt_mask | gt_prop | gt_maskprop |
+|---|---|---|---|---|
+| Published JSON (`1b092d8` commit)  | 0.368 | 0.432   | 0.427   | 0.437       |
+| `1b092d8` `pmoe/` re-run today     | 0.330 | 0.335   | 0.313   | 0.331       |
+| Master HEAD (corrected) re-run     | 0.313 | 0.342   | 0.330   | 0.337       |
+
+Three different result sets from the same checkpoints on disk. The published JSON cannot be
+deterministically reproduced from any code state — including the very commit (`1b092d8`) that
+shipped it. This is consistent with AUDIT.md item K's documented bf16 nondeterminism on this
+near-zero-variance task (point estimate swung 0.024 / 0.350 / 0.271 on the same checkpoints).
+The published 0.368/0.432 was a one-time bf16-era analysis whose JSON happened to land in the
+same commit as the fp32 fix; the directional sign (positive Δ) and the "ns" conclusion are
+preserved across all three re-runs, but the magnitude was overstated.
+
+**Fix:** master commits `f0b921c` (continuity correction) and `14ce619` (re-analysis with fp32
+predict_test) publish the deterministic values (`none` 0.313, `gt_mask` 0.342, Δ=+0.029,
+Holm-p=1.0). The paper text, results/PAPER.md, results/SUMMARY.md, and README all reflect these
+numbers as of commit `14ce619`. **Lesson:** when a metric is sensitive enough that a single
+nondeterministic run can swing it by 10×, a single "deterministic fp32" rerun is not enough
+verification — re-run from disk after every code change that could touch the forward pass.
+
+## M. Paired-bootstrap p-value floor — `p=0` was distributionally impossible (2026-05-28)
+
+`pmoe/eval/stats.py` `paired_cluster_bootstrap` used the v1 estimator
+`p = 2*min((boots<=0).mean(), (boots>=0).mean())`, which returns exactly 0.0 whenever every
+bootstrap delta lands on one side of zero — a value the bootstrap can never produce. Every
+"p<0.001" headline in the paper was actually this degenerate `p=0`, with no continuity correction.
+Fixed in commit `f0b921c` with the standard `(2*min(n_le, n_ge) + 1)/(B+1)` correction; at
+`B=2000` the floor is `1/2001 ≈ 5e-4`. The fix is exercised by two regression tests in
+`tests/test_stats.py` (clean separation must hit the floor; null case must give `p>0.05`).
