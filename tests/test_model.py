@@ -108,6 +108,25 @@ def test_moeffn_routes_changes_input():
     assert float(aux) > 0
 
 
+def test_lri_eval_determinism():
+    """LatentGRNInference must be deterministic in eval mode.
+
+    Regression for the code/analyze_gate_degeneracy.py finding: the v1 LRI sampled eps from
+    its variational posterior even with model.eval(), so two forward passes on the same
+    batch produced different gates -- which made the "high-confidence regulatory edges"
+    in the original LRI episode pure sampling noise. The fix in pmoe/models/layers.py uses
+    mu (not mu + eps*std) at eval; this test would fail if that fix is ever reverted.
+    """
+    torch.manual_seed(7)
+    cfg = _tiny_cfg(latent_grn=True)
+    model = PathwayMoEPerturb(cfg, _bool_grn(cfg.n_genes)).eval()
+    batch = _rand_batch(cfg, B=3)
+    with torch.no_grad():
+        o1 = model(**batch)
+        o2 = model(**batch)
+    assert torch.equal(o1, o2), "LRI eval forward must be deterministic"
+
+
 def test_mixed_attention_weighted_bias_runs():
     torch.manual_seed(0)
     cfg = _tiny_cfg()

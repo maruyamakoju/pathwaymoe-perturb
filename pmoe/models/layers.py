@@ -121,7 +121,9 @@ class MoEFFN(nn.Module):
             logits = logits + pathway_prior.unsqueeze(0)
             
         if self.training:
-            logits = logits + torch.randn_like(logits)  # Exploration noise
+            # Switch-Transformer-style routing noise; std=0.1 matches Fedus et al. 2021.
+            # The pre-2026 std=1.0 was an order of magnitude larger than the literature.
+            logits = logits + 0.1 * torch.randn_like(logits)
             
         probs = F.softmax(logits, dim=-1)
         top_probs, top_indices = probs.topk(k, dim=-1)

@@ -103,12 +103,14 @@ class Trainer:
         self.callbacks = callbacks or []
         
         self.optimizer = torch.optim.AdamW(
-            self.model.parameters(), 
-            lr=self.cfg.lr, 
+            self.model.parameters(),
+            lr=self.cfg.lr,
             weight_decay=self.cfg.weight_decay,
             betas=(0.9, 0.95)
         )
-        self.scaler = torch.cuda.amp.GradScaler(enabled=device == "cuda")
+        # torch.amp.GradScaler('cuda', ...) is the non-deprecated form on torch >= 2.5
+        self._use_cuda_amp = (str(device) == "cuda" or getattr(device, "type", None) == "cuda")
+        self.scaler = torch.amp.GradScaler("cuda", enabled=self._use_cuda_amp)
         self.step_count = 0
 
     def _get_lr_multiplier(self) -> float:
@@ -128,8 +130,8 @@ class Trainer:
         self.optimizer.zero_grad(set_to_none=True)
         for i, batch in enumerate(loader):
             batch = {k: (v.to(self.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
-            
-            with torch.cuda.amp.autocast(enabled=self.device == "cuda", dtype=torch.bfloat16):
+
+            with torch.amp.autocast("cuda", enabled=self._use_cuda_amp, dtype=torch.bfloat16):
                 # model forward expects explicit args or **kwargs
                 pred = self.model(**batch)
                 loss = weighted_huber_loss(pred.float(), batch["lfc"].float())
@@ -168,22 +170,25 @@ class Trainer:
 
     @torch.no_grad()
     def evaluate(self, loader: DataLoader) -> Dict[str, float]:
+        """Validation pass in fp32 (no autocast).
+
+        The paper's "deterministic fp32 eval" claim used to apply only to predict_test;
+        keeping val eval in bf16 created a (small) inconsistency in how the best-checkpoint
+        metric was computed vs the published test metric. fp32 here costs a few seconds
+        per epoch and makes the early-stop signal byte-reproducible across runs.
+        """
         self.model.eval()
         all_preds, all_true, all_masks = [], [], []
-        
         for batch in loader:
             batch_gpu = {k: (v.to(self.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
-            with torch.cuda.amp.autocast(enabled=self.device == "cuda", dtype=torch.bfloat16):
-                pred = self.model(**batch_gpu)
-                
+            pred = self.model(**batch_gpu)
             all_preds.append(pred.float().cpu().numpy())
             all_true.append(batch["lfc"].numpy())
             all_masks.append(batch["deg_mask"].numpy())
-            
         return compute_metrics(
-            np.concatenate(all_preds), 
-            np.concatenate(all_true), 
-            np.concatenate(all_masks)
+            np.concatenate(all_preds),
+            np.concatenate(all_true),
+            np.concatenate(all_masks),
         )
 
     def fit(self, train_loader: DataLoader, val_loader: DataLoader) -> Dict[str, Any]:
@@ -281,7 +286,10 @@ def train(
         np.random.seed(seed)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
-        
+        # warn_only=True so a nondeterministic op (e.g. scatter_add backward) prints a
+        # warning instead of raising — required for SDPA + scatter on some kernels.
+        torch.use_deterministic_algorithms(True, warn_only=True)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     run = RunSpec(dataset=dataset, split=split, variant=variant, seed=seed, size=size, tag=tag)
 
