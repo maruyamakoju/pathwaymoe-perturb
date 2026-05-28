@@ -70,6 +70,47 @@ def test_paired_cluster_bootstrap_a_greater_than_b():
     assert res["ci"][0] < res["delta"] < res["ci"][1] or res["ci"][0] <= res["delta"] <= res["ci"][1]
 
 
+def test_paired_bootstrap_p_never_zero():
+    """Continuity-corrected p has a 1/(B+1) floor; a clean separation must NOT print p=0.
+
+    Regression for the v1 formula p=2*min((boots<=0).mean(), (boots>=0).mean()), which
+    returned exactly 0 whenever every bootstrap delta landed on one side of zero — a
+    distributionally impossible value that fed Holm correction.
+    """
+    rng = np.random.default_rng(0)
+    n_groups, per_group, n_boot = 30, 20, 2000
+    a, b, groups = [], [], []
+    for g in range(n_groups):
+        # huge, clean offset: a is +5.0 above b every group; no overlap in any bootstrap.
+        a.append(5.0 + 0.01 * rng.standard_normal(per_group))
+        b.append(0.0 + 0.01 * rng.standard_normal(per_group))
+        groups.append(np.full(per_group, g))
+    a = np.concatenate(a); b = np.concatenate(b); groups = np.concatenate(groups)
+    res = paired_cluster_bootstrap(a, b, groups, n_boot=n_boot, seed=0)
+    floor = 1.0 / (n_boot + 1)
+    assert res["p"] >= floor - 1e-12, f"p={res['p']} below 1/(B+1)={floor}"
+    assert res["p"] < 5 * floor, "expected p near the floor under huge separation"
+
+
+def test_paired_bootstrap_null_calibrated():
+    """Under the null (i.i.d. a, b with same mean), p should usually be > 0.05.
+
+    Sanity check that the formula's direction is right: not a strict calibration test
+    (one seed only), but a regression guard against accidental sign flips.
+    """
+    rng = np.random.default_rng(13)
+    n_groups, per_group = 25, 15
+    a, b, groups = [], [], []
+    for g in range(n_groups):
+        offset = rng.standard_normal()
+        a.append(offset + rng.standard_normal(per_group) * 0.5)
+        b.append(offset + rng.standard_normal(per_group) * 0.5)
+        groups.append(np.full(per_group, g))
+    a = np.concatenate(a); b = np.concatenate(b); groups = np.concatenate(groups)
+    res = paired_cluster_bootstrap(a, b, groups, n_boot=2000, seed=0)
+    assert res["p"] > 0.05, f"null contrast falsely rejected at seed 13 (p={res['p']})"
+
+
 def test_effect_summary_flags():
     # Big, significant delta -> significant_and_meaningful True.
     big = effect_summary(delta=0.05, ci=(0.03, 0.07), p_corrected=0.001)

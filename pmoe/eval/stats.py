@@ -95,8 +95,12 @@ def paired_cluster_bootstrap(a, b, groups, n_boot: int = 2000, seed: int = SEED,
         pick = rng.integers(0, n_groups, size=n_groups)
         boots[i] = np.concatenate([members[j] for j in pick]).mean()
     lo, hi = np.percentile(boots, [100 * alpha / 2, 100 * (1 - alpha / 2)])
-    # Two-sided p: fraction of bootstrap deltas on the opposite side of 0, doubled.
-    p = 2 * min((boots <= 0).mean(), (boots >= 0).mean())
+    # Two-sided bootstrap p-value with a +1/(B+1) continuity correction so the smallest
+    # achievable p is 1/(B+1), not 0 (which is distributionally impossible). Without this
+    # a clean separation prints "p=0" and Holm-correction inputs become degenerate.
+    n_le = int((boots <= 0).sum())
+    n_ge = int((boots >= 0).sum())
+    p = (2 * min(n_le, n_ge) + 1) / (n_boot + 1)
     return {"delta": delta, "ci": (float(lo), float(hi)), "p": float(min(1.0, p))}
 
 
