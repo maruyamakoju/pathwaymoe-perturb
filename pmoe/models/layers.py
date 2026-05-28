@@ -209,7 +209,7 @@ class LatentGRNInference(nn.Module):
 
         # Reparameterization trick (sample only while training; use the mean at eval so
         # extracted gates are deterministic/reproducible. Sampling eps at eval made the
-        # gate ~100% noise — see code/analyze_gate_degeneracy.py.)
+        # gate ~100% noise — see code/archive/analyze_gate_degeneracy.py.)
         if self.training:
             std = torch.exp(0.5 * logvar)
             eps = torch.randn_like(std)

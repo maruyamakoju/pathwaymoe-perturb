@@ -19,4 +19,4 @@ Full analysis: `../LATENT_GRN_STUDY.md` and `../../WORK_LOG.md`.
 - `gate_degeneracy_report_gateonly.json`   — steelman gate-only model
 - `gate_degeneracy_report_gateonly_lowkl.json` — steelman gate-only, KL=1e-5
 
-Reproduce: `python code/analyze_gate_degeneracy.py <run_name> synthetic_hard_v2 <suffix>`
+Reproduce: `python code/archive/analyze_gate_degeneracy.py <run_name> synthetic_hard_v2 <suffix>`

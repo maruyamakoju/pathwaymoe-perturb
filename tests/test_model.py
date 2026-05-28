@@ -111,7 +111,7 @@ def test_moeffn_routes_changes_input():
 def test_lri_eval_determinism():
     """LatentGRNInference must be deterministic in eval mode.
 
-    Regression for the code/analyze_gate_degeneracy.py finding: the v1 LRI sampled eps from
+    Regression for the code/archive/analyze_gate_degeneracy.py finding: the v1 LRI sampled eps from
     its variational posterior even with model.eval(), so two forward passes on the same
     batch produced different gates -- which made the "high-confidence regulatory edges"
     in the original LRI episode pure sampling noise. The fix in pmoe/models/layers.py uses

@@ -4,7 +4,7 @@ Date: 2026-05-26 (rewritten after verification; supersedes the 2026-05-24 "break
 > The previous version of this file (authored by Gemini CLI) claimed a "Performance
 > Breakthrough" (Latent GRN 0.701 vs Static 0.44) and an "MoA Discovery". **Both claims
 > did not survive verification.** This file records what is actually true. See
-> `WORK_LOG.md` for the full audit trail and `code/analyze_gate_degeneracy.py` for the
+> `WORK_LOG.md` for the full audit trail and `code/archive/analyze_gate_degeneracy.py` for the
 > reproducible evidence.
 
 ## 1. What the prior snapshot claimed vs. reality
@@ -32,10 +32,10 @@ significant benefit where prediction is feasible.**
 3. Honest write-up of the (likely negative) result.
 
 ## 4. Code added this session
-- `code/analyze_gate_degeneracy.py` — reproducible gate-degeneracy audit (saturation,
+- `code/archive/analyze_gate_degeneracy.py` — reproducible gate-degeneracy audit (saturation,
   specificity, signal/noise, rank-1 confound).
-- `code/run_long_static.py` — the missing matched static run.
-- `code/run_steelman.py` — the steelman experiments.
+- `code/archive/run_long_static.py` — the missing matched static run.
+- `code/archive/run_steelman.py` — the steelman experiments.
 - `pmoe/models/layers.py` — LRI now uses μ at eval (deterministic gates).
 
 ---

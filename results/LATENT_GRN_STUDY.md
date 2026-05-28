@@ -32,7 +32,7 @@ At equal epochs **static wins**, and the gap *grows* with training. The collapse
 slightly hurts relative to a clean static mask. *(Multi-seed error bars: see §4.)*
 
 ### 2. The gate is degenerate (VAE posterior collapse)
-`code/analyze_gate_degeneracy.py` on the trained latent checkpoint(s):
+`code/archive/analyze_gate_degeneracy.py` on the trained latent checkpoint(s):
 
 | model (50/20ep) | gate mean | within-drug spatial std | across-drug std | sampling-noise std |
 |---|---|---|---|---|
@@ -70,7 +70,7 @@ is forced to rely on the dynamic gate, it does no better than having no regulato
 at all. The idea does not work here.
 
 ### 4. Multi-seed confirmation
-`code/run_multiseed_confirm.py` — 3 seeds × {static, latent} × 50ep (fixed data split,
+`code/archive/run_multiseed_confirm.py` — 3 seeds × {static, latent} × 50ep (fixed data split,
 varied init/optimization), `results/multiseed_confirm.json`:
 
 | seed | static | latent | gap (static−latent) |
@@ -96,7 +96,7 @@ map noise to biology.
 ## What was changed / added
 - `pmoe/models/layers.py`: LRI uses μ at eval (deterministic, reproducible gates).
 - `pmoe/experiments/train.py`: `latent_grn_kl_weight` override (for the KL sweep).
-- `code/analyze_gate_degeneracy.py`, `run_long_static.py`, `run_steelman.py`,
+- `code/archive/analyze_gate_degeneracy.py`, `run_long_static.py`, `run_steelman.py`,
   `run_multiseed_confirm.py`.
 - Fixed 4 stale `tests/test_grn_propagation.py` (flat→nested ModelConfig); 44 pytest pass.
 - `LATEST_STATUS.md` rewritten; full audit in `WORK_LOG.md`.

@@ -19,7 +19,7 @@ Read top-to-bottom; newest sections appended at the end.
 ---
 
 ## Step 0 — LRI gate degeneracy (DECISION POINT) — DONE
-Script: `code/analyze_gate_degeneracy.py` -> `results/interpretability/gate_degeneracy_report.json`
+Script: `code/archive/analyze_gate_degeneracy.py` -> `results/interpretability/gate_degeneracy_report.json`
 Checkpoint analyzed: `synthetic_hard_v2__...__long_latent.pt` (the 50ep model, val 0.701).
 
 Findings (all damning):
@@ -44,8 +44,8 @@ which is exactly why latent-GRN performance == static-GRN performance.
 - [DONE] Rewrote LATEST_STATUS.md to correct the invalid "breakthrough" + void "MoA".
 - [DONE] Fixed 4 stale tests in tests/test_grn_propagation.py (flat->nested ModelConfig,
   model(batch)->model(**batch)). Full suite now 44 passed.
-- [RUNNING] `code/run_long_static.py` -> matched static 50ep (runs/...long_static.jsonl).
-- [RUNNING] `code/run_steelman.py` -> E1 nogrn / E2 gateonly / E3 gateonly_lowkl / E4 static,
+- [RUNNING] `code/archive/run_long_static.py` -> matched static 50ep (runs/...long_static.jsonl).
+- [RUNNING] `code/archive/run_steelman.py` -> E1 nogrn / E2 gateonly / E3 gateonly_lowkl / E4 static,
   20ep each, then degeneracy re-analysis of the gate-bearing models (runs/steelman.log,
   results/steelman_results.json).
 - [DONE] Updated memory (pathwaymoe-perturb.md) with the LRI episode.
