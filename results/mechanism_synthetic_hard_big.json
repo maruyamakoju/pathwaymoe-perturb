@@ -5,94 +5,96 @@
   "n_clusters": 39,
   "conditions": {
     "none": {
-      "deg50": 0.313212162641091,
+      "deg50": 0.31663441975606876,
       "ci": [
-        0.19011705118880554,
-        0.4439990370086288
+        0.1808336734381032,
+        0.4448316589638826
       ],
       "n_seeds": 3
     },
     "gt_mask": {
-      "deg50": 0.3424586432224235,
+      "deg50": 0.39550896745456887,
       "ci": [
-        0.2200467389376457,
-        0.46230833082967787
+        0.27019195521048295,
+        0.5258813131797169
       ],
       "n_seeds": 3
     },
     "gt_prop": {
-      "deg50": 0.3303023371454015,
+      "deg50": 0.3699421122690507,
       "ci": [
-        0.2080690030722558,
-        0.4500505569604186
+        0.24692672795301798,
+        0.4966892866347854
       ],
       "n_seeds": 3
     },
     "gt_maskprop": {
-      "deg50": 0.33715453612839025,
+      "deg50": 0.3914469701380324,
       "ci": [
-        0.2142170802206318,
-        0.457829804568114
+        0.26634813470717084,
+        0.5229598282153131
       ],
       "n_seeds": 3
     }
   },
   "contrasts": {
     "gt_mask_vs_none": {
-      "delta": 0.02924648058133249,
+      "delta": 0.0788745476985001,
       "ci": [
-        -0.0708965058120586,
-        0.13372085948972187
+        -0.037307148092957924,
+        0.20414017190049874
       ],
-      "p": 0.5992003998001,
-      "p_holm": 1.0,
-      "p_corrected": 1.0,
+      "p": 0.18840579710144928,
+      "p_holm": 0.5652173913043479,
+      "p_corrected": 0.5652173913043479,
       "min_effect": 0.01,
       "significant": false,
       "meaningful": true,
       "significant_and_meaningful": false
     },
     "gt_prop_vs_none": {
-      "delta": 0.01709017450431052,
+      "delta": 0.05330769251298192,
       "ci": [
-        -0.08200066420298709,
-        0.1236172932132397
+        -0.06512524455556402,
+        0.1820392778372486
       ],
-      "p": 0.7591204397801099,
-      "p_holm": 1.0,
-      "p_corrected": 1.0,
+      "p": 0.36931534232883556,
+      "p_holm": 0.5652173913043479,
+      "p_corrected": 0.5652173913043479,
       "min_effect": 0.01,
       "significant": false,
       "meaningful": true,
       "significant_and_meaningful": false
     },
     "gt_maskprop_vs_none": {
-      "delta": 0.023942373487299246,
+      "delta": 0.07481255038196373,
       "ci": [
-        -0.07654917898818384,
-        0.1299231404135343
+        -0.043547575179328994,
+        0.20517676804445767
       ],
-      "p": 0.665167416291854,
-      "p_holm": 1.0,
-      "p_corrected": 1.0,
+      "p": 0.2143928035982009,
+      "p_holm": 0.5652173913043479,
+      "p_corrected": 0.5652173913043479,
       "min_effect": 0.01,
       "significant": false,
       "meaningful": true,
       "significant_and_meaningful": false
     },
     "gt_prop_vs_gt_mask": {
-      "delta": -0.01215630607702198,
+      "delta": -0.02556685518551818,
       "ci": [
-        -0.03271925274066446,
-        0.015917832230594064
+        -0.04886955942196665,
+        0.0017630132566596752
       ],
-      "p": 0.3563218390804598,
-      "p_holm": 1.0,
-      "p_corrected": 1.0,
+      "p": 0.0734632683658171,
+      "p_holm": 0.2938530734632684,
+      "p_corrected": 0.2938530734632684,
       "min_effect": 0.01,
       "significant": false,
       "meaningful": true,
       "significant_and_meaningful": false
     }
-  }
+  },
+  "eval_device": "cpu",
+  "eval_note": "Single deterministic CPU forward (--eval-device cpu). Mechanism DEG50 on synthetic_hard_big is sensitive to CUDA atomic-add ordering in MoE index_add_; GPU re-evaluations vary by ~5% in DEG50 across processes and bias the magnitude systematically low. CPU eval is bit-reproducible. See AUDIT.md item N."
 }

@@ -17,7 +17,10 @@ Write-Host "== synthetic (shared-target) + positive control ==" -ForegroundColor
 
 Write-Host "== synthetic (novel-target) mechanism: mask vs soft message-passing ==" -ForegroundColor Cyan
 & $py -m pmoe.data.synth --dataset synthetic_hard_big --unique-targets --n-extra-drugs 150
-& $py -m pmoe.experiments.mechanism --dataset synthetic_hard_big --seeds 1337 1 2 --epochs 35 --batch 96
+# Train on CUDA; analyze on CPU because the near-zero-variance metric is sensitive to CUDA
+# atomic-add ordering in MoE index_add_ (~5% DEG50 swing per process invocation). See AUDIT.md N.
+& $py -m pmoe.experiments.mechanism --dataset synthetic_hard_big --seeds 1337 1 2 --epochs 35 --batch 96 --train-only
+& $py -m pmoe.experiments.mechanism --dataset synthetic_hard_big --seeds 1337 1 2 --analyze-only --eval-device cpu
 
 Write-Host "== real Tahoe-100M (requires built subset) ==" -ForegroundColor Cyan
 # & $py -m pmoe.data.preprocess_tahoe --dataset tahoe_full --n-hvg 2000   # build from shards first

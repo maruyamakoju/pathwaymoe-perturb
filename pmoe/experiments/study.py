@@ -75,8 +75,18 @@ def run_grid(dataset, splits, variants, seeds, tc: TrainConfig, size="base"):
                         torch.cuda.empty_cache()
 
 
-def analyze(dataset, splits, variants, seeds, size="base"):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+def analyze(dataset, splits, variants, seeds, size="base", eval_device="auto"):
+    """Analyze the trained grid with cluster-bootstrap CIs + Holm correction.
+
+    ``eval_device``: "auto" picks cuda when available, "cpu" forces CPU eval (slow but
+    deterministic). On tahoe_full the GPU-eval noise floor is ~0.001 in DEG50 (negligible);
+    on near-zero-variance regimes the GPU is non-deterministic across processes — use
+    ``--eval-device cpu`` for bit-reproducible numbers. See AUDIT.md item N.
+    """
+    if eval_device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+    else:
+        device = eval_device
     df = load_conditions(dataset)
     Y = stack_arrays(df, "lfc"); deg = stack_arrays(df, "deg_mask")
     shared = build_shared(dataset, df)
@@ -198,12 +208,14 @@ def main():
     ap.add_argument("--size", default="base")
     ap.add_argument("--train-only", action="store_true")
     ap.add_argument("--analyze-only", action="store_true")
+    ap.add_argument("--eval-device", default="auto", choices=["auto", "cpu", "cuda"],
+                    help="Evaluation device. 'cpu' forces deterministic CPU eval (slow but bit-reproducible).")
     a = ap.parse_args()
     tc = TrainConfig(epochs=a.epochs, batch_size=a.batch)
     if not a.analyze_only:
         run_grid(a.dataset, a.splits, a.variants, a.seeds, tc, a.size)
     if not a.train_only:
-        analyze(a.dataset, a.splits, a.variants, a.seeds, a.size)
+        analyze(a.dataset, a.splits, a.variants, a.seeds, a.size, eval_device=a.eval_device)
 
 
 if __name__ == "__main__":

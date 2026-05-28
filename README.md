@@ -12,8 +12,8 @@ mechanism** (hard attention mask vs soft GNN message-passing).
 > A structured GRN prior confers **no significant benefit** for OOD perturbation prediction **where
 > prediction is feasible** — on a 22.6M-cell real Tahoe-100M subset and on synthetic data with shared
 > drug targets it is *redundant* (a flexible model learns the response directly). The true GRN only
-> *weakly hints* at helping for **novel targets** (+0.02–0.03 DEG-Pearson, not significant), a
-> near-unpredictable regime, and the **injection mechanism does not matter**.
+> *plausibly* helps for **novel targets** (+0.05–0.08 DEG-Pearson, meaningful but not significant),
+> a near-unpredictable regime, and the **injection mechanism does not matter**.
 
 | Model (unseen-drug, 39 drug clusters, cluster-bootstrap 95% CI) | DEG-Pearson@50 |
 |---|---|

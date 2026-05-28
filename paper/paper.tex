@@ -44,8 +44,8 @@ across three OOD splits it loses to ridge on \texttt{unseen\_cell\_line} ($0.824
 ties the mean-effect baseline on \texttt{unseen\_both} ($0.581$ vs $0.607$, ns), and shows only a small
 non-significant edge on \texttt{unseen\_drug} ($0.629$ vs $0.601$, overlapping CIs). On synthetic data
 we localize why: when test perturbations \textbf{share targets} with training, even the \emph{true} GRN
-is redundant (true GRN $+0.014$, ns); when targets are \textbf{novel}, the true GRN gives a small
-positive but \textbf{non-significant} gain ($\Delta\approx+0.02$--$0.03$, Holm-$p\!=\!1.0$) in a
+is redundant (true GRN $+0.014$, ns); when targets are \textbf{novel}, the true GRN gives a
+meaningful but \textbf{non-significant} gain ($\Delta\!=\!+0.079$, Holm-$p\!=\!0.57$) in a
 near-unpredictable regime, and the \textbf{injection mechanism} (hard attention mask vs soft
 message-passing) does not matter. We
 conclude that a structured GRN prior is not an effective inductive bias for OOD perturbation prediction
@@ -252,26 +252,28 @@ GRN-injection \emph{mechanisms}.
 \toprule
 Model (all use the true GRN) & DEG-Pearson@50 & $\Delta$ vs none (Holm-$p$) \\
 \midrule
-none & 0.313 [0.190, 0.444] & --- \\
-GRN as attention mask & 0.342 [0.220, 0.462] & \textbf{+0.029 (1.0)} \\
-GRN as soft propagation & 0.330 [0.208, 0.450] & +0.017 (1.0) \\
-GRN as mask + propagation & 0.337 [0.214, 0.458] & +0.024 (1.0) \\
+none & 0.317 [0.181, 0.445] & --- \\
+GRN as attention mask & 0.396 [0.270, 0.526] & \textbf{+0.079 (0.57)} \\
+GRN as soft propagation & 0.370 [0.247, 0.497] & +0.053 (0.57) \\
+GRN as mask + propagation & 0.391 [0.266, 0.523] & +0.075 (0.57) \\
 \bottomrule
 \end{tabular}
-\caption{Novel targets: the true GRN gives a small positive but non-significant gain; the injection
-mechanism does not matter.}
+\caption{Novel targets: the true GRN gives a meaningful but non-significant gain; the injection
+mechanism does not matter. CPU-eval point estimates (mechanism is sensitive to CUDA atomic-add
+ordering — see \S\ref{sec:repro}).}
 \end{table}
 
-The true GRN yields a small positive point-estimate gain ($+0.02$--$0.03$, marginally above the
-pre-registered $|\Delta|\!\geq\!0.01$ threshold) but it is \textbf{not statistically significant}
-(Holm-$p\!=\!1.0$): novel targets are intrinsically hard, so between-drug variance is large and the
-39-cluster CIs are wide ($[0.19, 0.46]$). The \textbf{injection mechanism does not matter}
-(mask $\approx$ propagation $\approx$ both), arguing against ``we just used the wrong mechanism.''
+The true GRN yields a meaningful point-estimate gain ($+0.05$--$0.08$, all above the pre-registered
+$|\Delta|\!\geq\!0.01$ threshold) but it is \textbf{not statistically significant}
+(Holm-$p\!=\!0.57$): novel targets are intrinsically hard, so between-drug variance is large and
+the 39-cluster CIs are wide ($[0.18, 0.53]$). The \textbf{injection mechanism does not matter}
+(mask $\approx$ propagation $\approx$ both; mask\,vs\,prop $\Delta\!=\!-0.026$), arguing against
+``we just used the wrong mechanism.''
 
 \paragraph{Bottom line.} Where OOD prediction is \emph{feasible}---real Tahoe and synthetic
-shared-target---a GRN prior confers \textbf{no} benefit. The GRN only \emph{weakly hints} at helping
-for novel targets, a near-unpredictable regime where the $+0.02$--$0.03$ gain is not significant;
-independent of injection mechanism.
+shared-target---a GRN prior confers \textbf{no} benefit. The GRN \emph{plausibly} helps for novel
+targets, a near-unpredictable regime where the $+0.05$--$0.08$ gain is meaningful but not
+significant; independent of injection mechanism.
 
 \section{Discussion}
 A likely mechanism, beyond the redundancy/insufficiency dichotomy, is \textbf{mask sparsity}: with
@@ -290,16 +292,22 @@ not how to realize the benefit.
 2{,}000 HVGs (not full transcriptome); one model family (PathwayMoE)---though we tested two GRN injection
 mechanisms, both null; co-response GRN is correlational, not causal; the synthetic generative process
 simplifies real regulation; the GRN-propagation baseline needs drug$\rightarrow$target labels (absent on
-the Tahoe subset). The novel-target positive control, while suggestive ($+0.02$--$0.03$), is underpowered
-by the intrinsic difficulty of that regime.
+the Tahoe subset). The novel-target positive control, while suggestive ($+0.05$--$0.08$), is
+underpowered by the intrinsic difficulty of that regime.
 
-\section{Reproducibility \& availability}
+\section{Reproducibility \& availability}\label{sec:repro}
 The typed \texttt{pmoe/} package (\texttt{experiments/\{study,mechanism,train\}.py},
 \texttt{priors/grn.py}, \texttt{eval/\{metrics,stats,loading,report\}.py}) $+$ \texttt{reproduce.ps1};
-44 tests incl.\ a leakage regression test. Split seed fixed; 3 model seeds; deterministic fp32 eval;
-cluster-bootstrap 95\% CIs $+$ Holm correction. Each checkpoint stores an env+data provenance manifest.
-Real data $=$ 803/3{,}388 Tahoe-100M shards (22.66M cells). The OOD-split re-run used batch 48 (batch 96
-exhausts 24\,GB VRAM).
+63 tests incl.\ a leakage regression test and a checkpoint roundtrip. Split seed fixed; 3 model seeds;
+deterministic fp32 eval; cluster-bootstrap 95\% CIs $+$ Holm correction with a $+1/(B+1)$ continuity
+correction. Each checkpoint stores an env+data provenance manifest. Real data $=$ 803/3{,}388
+Tahoe-100M shards (22.66M cells). The OOD-split re-run used batch 48 (batch 96 exhausts 24\,GB VRAM).
+\paragraph{Eval-time determinism.} On Tahoe the CUDA noise floor in DEG-Pearson is $\!\leq\!10^{-3}$ and the
+default ``\texttt{--eval-device auto}'' (CUDA) is reported. On the near-zero-variance synthetic
+novel-target regime (\S3.4) CUDA \texttt{index\_add\_} atomic-add ordering introduces a $\sim\!0.05$
+DEG-Pearson swing per process invocation; that table is computed under
+``\texttt{--eval-device cpu}'' (bit-reproducible, $\sim\!15$\,min on the same hardware). See
+\texttt{AUDIT.md} item N.
 
 \paragraph{Code \& data.}
 Code is available at \url{https://github.com/maruyamakoju/pathwaymoe-perturb}.

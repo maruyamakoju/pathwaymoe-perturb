@@ -48,8 +48,19 @@ def run(dataset, split, seeds, epochs, batch, size="base"):
                 import traceback; print(f"[FAIL] {r.name}: {e}", flush=True); traceback.print_exc()
 
 
-def analyze(dataset, split, seeds, size="base"):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+def analyze(dataset, split, seeds, size="base", eval_device="auto"):
+    """Cluster-bootstrap analyze of mechanism conditions.
+
+    ``eval_device``: "auto" picks cuda when available, "cpu" forces CPU eval. CPU eval is
+    SLOW but bitwise-deterministic across process invocations. On synthetic_hard_big the
+    per-condition DEG50 metric exhibits ~5% run-to-run variance on CUDA (suspected MoE
+    index_add_ atomic-add ordering); use eval_device="cpu" for publication-grade numbers.
+    See AUDIT.md item N.
+    """
+    if eval_device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+    else:
+        device = eval_device
     df = load_conditions(dataset); Y = stack_arrays(df, "lfc")
     shared = build_shared(dataset, df)
     sp_ = make_splits(df, split, seed=SEED); te, groups = sp_["test"], sp_["groups"]
@@ -99,11 +110,15 @@ def main():
     ap.add_argument("--seeds", nargs="+", type=int, default=[1337, 1, 2])
     ap.add_argument("--epochs", type=int, default=35)
     ap.add_argument("--batch", type=int, default=96)
+    ap.add_argument("--train-only", action="store_true")
     ap.add_argument("--analyze-only", action="store_true")
+    ap.add_argument("--eval-device", default="auto", choices=["auto", "cpu", "cuda"],
+                    help="Evaluation device. 'cpu' forces deterministic CPU eval (slow but bit-reproducible).")
     a = ap.parse_args()
     if not a.analyze_only:
         run(a.dataset, a.split, a.seeds, a.epochs, a.batch)
-    analyze(a.dataset, a.split, a.seeds)
+    if not a.train_only:
+        analyze(a.dataset, a.split, a.seeds, eval_device=a.eval_device)
 
 
 if __name__ == "__main__":

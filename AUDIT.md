@@ -121,6 +121,44 @@ numbers as of commit `14ce619`. **Lesson:** when a metric is sensitive enough th
 nondeterministic run can swing it by 10×, a single "deterministic fp32" rerun is not enough
 verification — re-run from disk after every code change that could touch the forward pass.
 
+## N. CUDA eval is non-deterministic on near-zero-variance regimes — use ``--eval-device cpu`` for publication (2026-05-28)
+
+While verifying item L's "+0.029" point estimate, we found that running
+``python -m pmoe.experiments.mechanism --dataset synthetic_hard_big --analyze-only`` in 5
+**independent processes** (CUBLAS_WORKSPACE_CONFIG=:4096:8 set,
+``torch.use_deterministic_algorithms(True, warn_only=True)`` on, math SDPA forced) gave
+the following DEG-Pearson@50 deltas vs no-GRN:
+
+| run | Δ gt_mask | Δ gt_prop | Δ gt_maskprop |
+|---|---|---|---|
+| 1 | -0.040 | -0.050 | -0.041 |
+| 2 | +0.038 | +0.030 | +0.038 |
+| 3 | -0.080 | -0.089 | -0.084 |
+| 4 | +0.058 | +0.044 | +0.056 |
+| 5 | -0.035 | -0.043 | -0.034 |
+| **mean ± std** | **-0.012 ± 0.052** | **-0.022 ± 0.054** | **-0.013 ± 0.053** |
+
+Predictions are deterministic *within a single Python process* (`predict_test` called
+twice in the same script returns identical arrays), but vary by ~0.05 in DEG50 *across*
+processes. The same experiment on ``tahoe_full`` shows std ≤ 0.0006 (negligible). The
+discrepancy is consistent with CUDA atomic-add ordering in MoE ``index_add_`` (warned but
+not corrected under ``warn_only=True``), surfaced as observable noise only when the
+underlying metric is itself near zero (synthetic novel-target regime, |Δ| ≤ 0.05).
+
+**Fix:** ``pmoe/experiments/{mechanism,study}.py`` now accept ``--eval-device cpu`` to
+force a fully deterministic CPU forward at eval time. CPU eval is ~80 s per checkpoint
+(versus ~1.5 s on the 4090) so total ≈ 15 min for the 12 mechanism checkpoints — a small
+cost for publication-grade numbers. The published mechanism JSON
+(``results/mechanism_synthetic_hard_big.json``) and the paper tables are computed under
+``--eval-device cpu``; the tahoe study tables remain on the CUDA default since their
+noise floor is below the rounding precision reported.
+
+**Lesson:** "deterministic fp32 eval" requires more than ``autocast`` off:
+``index_add_`` / ``scatter_add_`` on CUDA are non-deterministic across processes even
+with ``use_deterministic_algorithms(True, warn_only=True)``. For any metric whose dynamic
+range is comparable to the SDPA/MoE atomic-add noise floor, run eval on CPU before
+publishing point estimates.
+
 ## M. Paired-bootstrap p-value floor — `p=0` was distributionally impossible (2026-05-28)
 
 `pmoe/eval/stats.py` `paired_cluster_bootstrap` used the v1 estimator
