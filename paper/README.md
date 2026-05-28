@@ -14,12 +14,16 @@ No LaTeX toolchain is installed on this machine. Build with either:
   ```
 
 ## Before submitting — required edits
-1. **Authors/affiliations** — the `\author{...}` field is a `\todo` placeholder.
-2. **References** — every entry in `references.bib` is a **stub** (`PLACEHOLDER`/`TODO`).
-   Replace all 12 with real citations; keys are already wired into `paper.tex`.
-3. **Venue style** — swap `\documentclass{article}` for the venue template (NeurIPS/ICML/
+1. **Authors/affiliations** — the `\author{...}` field is still a `\todo` placeholder.
+   Fill in real name + affiliation + contact before upload.
+2. **Venue style** — swap `\documentclass{article}` for the venue template (NeurIPS/ICML/
    journal) and adjust the bibliography style.
-4. Pick the target venue and trim to its page limit (current draft is full-length).
+3. Pick the target venue and trim to its page limit (current draft is full-length).
+
+## Already done
+- References are complete and verified (`references.bib`, 12 entries with DOIs).
+- Numerical tables reflect the corrected statistics pipeline (bootstrap p-value
+  continuity correction + leakage-free protocol).
 
 ## Consistency
 Numbers/claims mirror `../results/PAPER.md` (the source of truth) as of the latest commit,

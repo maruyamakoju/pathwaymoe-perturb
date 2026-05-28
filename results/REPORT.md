@@ -158,22 +158,27 @@ predicted response in its own pathway class. ![pathway response](fig_pathway_res
 
 ## 7. Reproduce
 
+> **All commands below are V1 and run the leakage-prone pipeline (HVG-selection
+> leakage bug B). Do not run them for published numbers — use `reproduce.ps1` at
+> the repo root, which drives the leakage-free `pmoe.*` package. The v1 scripts
+> referenced here now live under `code/archive/`.**
+
 ```powershell
 .\.venv\Scripts\activate ; $env:VC_DATA_ROOT="E:\vc_project_data"
 python tests\smoke.py                 # ~1 min full-pipeline check
-.\run_all.ps1 synthetic               # data -> baselines -> train 3 splits -> eval -> figures
-python code\eval_ablations.py --dataset synthetic
+.\code\archive\v1_runners\run_all.ps1 synthetic
+python code\archive\eval_ablations.py --dataset synthetic
 ```
 
 Real data (full transfer test):
 ```powershell
-python code\preprocess_tahoe.py            # downloads/uses Tahoe shards -> tahoe dataset
-python code\drugs.py tahoe                 # ChemBERTa features from canonical_smiles
+python code\archive\preprocess_tahoe.py            # downloads/uses Tahoe shards -> tahoe dataset
+python code\archive\drugs.py tahoe                 # ChemBERTa features from canonical_smiles
 # real priors: TRRUST GRN (priors\trrust_human.tsv) + Reactome (priors\Ensembl2Reactome_All_Levels.txt)
-python code\build_real_priors.py --dataset tahoe
-python code\baselines.py --dataset tahoe
-.\run_tahoe.ps1                            # train 3 splits + no-GRN ablation
-python code\eval.py --dataset tahoe ; python code\eval_ablations.py --dataset tahoe
+python code\archive\build_real_priors.py --dataset tahoe
+python code\archive\baselines.py --dataset tahoe
+.\code\archive\v1_runners\run_tahoe.ps1            # train 3 splits + no-GRN ablation
+python code\archive\eval.py --dataset tahoe ; python code\archive\eval_ablations.py --dataset tahoe
 ```
 
 ## 8. One-paragraph takeaway

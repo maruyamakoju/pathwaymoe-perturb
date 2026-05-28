@@ -149,8 +149,11 @@ baseline (a GRN-only linear message-passing model with no deep net). Each config
 \textbf{3 seeds}; point estimate $=$ per-condition mean over seeds; \textbf{cluster bootstrap}
 (resampling the grouping variable---drugs for \texttt{unseen\_drug}/\texttt{both}, cell-lines for
 \texttt{unseen\_cell\_line}) for 95\% CIs and \textbf{paired cluster bootstrap} for between-variant
-deltas; \textbf{Holm--Bonferroni} correction; effects called ``significant \emph{and} meaningful'' only
-when Holm-$p<0.05$ \emph{and} $|\Delta|\ge0.01$ (pre-registered minimum effect).
+deltas. Two-sided bootstrap $p$-values use a $+1/(B+1)$ continuity correction so the smallest
+achievable $p$ at $B\!=\!2000$ is $\approx\!5\times10^{-4}$, not the degenerate $p\!=\!0$ a naive
+estimator returns when all bootstrap deltas land on one side. \textbf{Holm--Bonferroni} correction
+is then applied; effects are called ``significant \emph{and} meaningful'' only when Holm-$p<0.05$
+\emph{and} $|\Delta|\ge0.01$ (pre-registered minimum effect).
 
 \section{Results}
 \subsection{Real Tahoe-100M --- GRN-quality spectrum (primary result)}
