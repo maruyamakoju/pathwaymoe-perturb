@@ -52,15 +52,16 @@ pivoted to the controlled GRN-quality study); a head-to-head vs scGPT/STATE/Taho
 pmoe/
   config.py        typed configs, enums, RunSpec (single source for paths/seeds/names)
   io.py            checkpoint + env/data provenance manifests
-  data/            loader, leakage-controlled splits (+cluster groups), dataset/collator
+  data/            loader, leakage-controlled splits (+cluster groups), dataset/collator,
+                   synth (synthetic ground-truth dataset), preprocess_tahoe (Tahoe-100M streaming)
   priors/          grn.py (variant spectrum, TRAIN-ONLY data-derived), pathways, drugs (ChemBERTa)
   models/          pathway_moe (GRN-masked SDPA attn + pathway MoE + pert cross-attn),
                    layers (incl. GRNPropagation soft message-passing), baselines (+GRN-propagation)
   eval/            metrics (DEG-Pearson@K), stats (cluster bootstrap, Holm, effect size), loading,
                    report (tables+figures)
   experiments/     train (robust in-process), study (grid runner), mechanism (mask vs propagation)
-tests/             43 tests incl. test_grn_leakage.py
-code/              v1 scripts (superseded by pmoe/; kept for provenance)
+tests/             55+ tests incl. test_grn_leakage.py
+code/archive/      v1 scripts (superseded by pmoe/; kept for provenance only)
 ```
 
 Data + checkpoints live on `E:\vc_project_data` (`VC_DATA_ROOT`); not in the repo.
@@ -69,13 +70,13 @@ Data + checkpoints live on `E:\vc_project_data` (`VC_DATA_ROOT`); not in the rep
 
 ```powershell
 .\.venv\Scripts\activate ; $env:VC_DATA_ROOT="E:\vc_project_data"
-python -m pytest -q                                   # 43 tests
+python -m pytest -q                                   # 55+ tests
 # synthetic (controlled) + positive control:
-python code\synth.py --dataset synthetic
+python -m pmoe.data.synth --dataset synthetic
 python -m pmoe.experiments.study  --dataset synthetic --splits unseen_drug --variants none random coexpr coexpr_lfc ground_truth
-python code\synth.py --dataset synthetic_hard_big --unique-targets --n-extra-drugs 150
+python -m pmoe.data.synth --dataset synthetic_hard_big --unique-targets --n-extra-drugs 150
 python -m pmoe.experiments.mechanism --dataset synthetic_hard_big
-# real Tahoe (needs the 22.6M-cell subset; see code\preprocess_tahoe_stream.py to build it):
+# real Tahoe (needs the 22.6M-cell subset; see pmoe/data/preprocess_tahoe.py to build it):
 python -m pmoe.experiments.study  --dataset tahoe_full --splits unseen_drug \
        --variants none random trrust trrust_weighted coexpr coexpr_lfc
 python -m pmoe.eval.report --dataset tahoe_full        # table + figure

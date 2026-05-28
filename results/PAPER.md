@@ -281,4 +281,4 @@ cluster-bootstrap 95% CIs + Holm correction. Each checkpoint stores an env+data 
 `mechanism_*.json`, the OOD-baseline audit `results/REAL_TAHOE_OOD_AUDIT.md`; figures
 `results/fig_grn_study_*_v2.png`, `fig_money_grn_effect.png`, `fig_comparison_tahoe.png`. Real data =
 803/3,388 Tahoe-100M shards (22.66M cells) on `E:\vc_project_data`; rebuild via
-`code/preprocess_tahoe_stream.py`. The OOD-split re-run used batch 48 (batch 96 exhausts 24 GB VRAM).
+`python -m pmoe.data.preprocess_tahoe`. The OOD-split re-run used batch 48 (batch 96 exhausts 24 GB VRAM).
