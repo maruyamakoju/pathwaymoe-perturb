@@ -35,6 +35,19 @@ def test_compute_metrics_keys():
         assert np.isfinite(m[k])
 
 
+def test_compute_metrics_empty_input_returns_nan_dict():
+    """Regression for the v1 IndexError on empty test sets.
+
+    When an analysis filters out all conditions, compute_metrics should return a NaN-filled
+    dict with the canonical key schema -- not crash with `rows[0].keys()` IndexError.
+    """
+    from pmoe.eval.metrics import METRIC_KEYS
+    out = compute_metrics(np.empty((0, 20)), np.empty((0, 20)))
+    assert set(out.keys()) == set(METRIC_KEYS)
+    for k, v in out.items():
+        assert np.isnan(v), f"{k}={v} should be NaN on empty input"
+
+
 def test_deg_pearson_per_condition_shape_and_topk():
     true, pred_good, _ = _make_data()
     arr = deg_pearson_per_condition(pred_good, true, k=50)

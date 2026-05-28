@@ -6,7 +6,7 @@ from pmoe.eval.metrics import (
     deg_pearson_per_condition,
     compute_metrics,
     DEG_KS,
-    LFC_THRESH,
+    METRIC_KEYS,
 )
 from pmoe.eval.stats import (
     bootstrap_ci,
@@ -20,7 +20,7 @@ __all__ = [
     "deg_pearson_per_condition",
     "compute_metrics",
     "DEG_KS",
-    "LFC_THRESH",
+    "METRIC_KEYS",
     "bootstrap_ci",
     "cluster_bootstrap_ci",
     "paired_cluster_bootstrap",

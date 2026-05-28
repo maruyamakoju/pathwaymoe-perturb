@@ -11,6 +11,7 @@ plus ``pathway_names.txt`` and ``pathways.meta.json``.
 from __future__ import annotations
 
 import json
+import warnings
 
 import numpy as np
 import scipy.sparse as sp
@@ -23,13 +24,17 @@ MIN_GENES = 5
 
 
 def _from_reactome(genes: list[str], max_pathways: int, min_genes: int = MIN_GENES):
-    """Build (N,P) bool CSR from the Ensembl-keyed Reactome dump, keeping the largest pathways."""
+    """Build (N,P) bool CSR from the Ensembl-keyed Reactome dump, keeping the largest pathways.
+
+    Pathway selection ties (same gene count) are broken by reactome_id so re-builds are
+    deterministic across line-order shuffles in the Reactome dump.
+    """
     gidx = {g: i for i, g in enumerate(genes)}
     rfile = PRIORS_ROOT / "Ensembl2Reactome_All_Levels.txt"
     pw_genes: dict[str, set] = {}
     pw_name: dict[str, str] = {}
     # columns: ensembl_id, reactome_id, url, name, evidence, species
-    for line in rfile.read_text(errors="ignore").splitlines():
+    for line in rfile.read_text(encoding="utf-8").splitlines():
         p = line.split("\t")
         if len(p) < 6 or p[5] != "Homo sapiens":
             continue
@@ -38,7 +43,7 @@ def _from_reactome(genes: list[str], max_pathways: int, min_genes: int = MIN_GEN
             pw_genes.setdefault(rid, set()).add(gidx[ens])
             pw_name[rid] = name
     top = sorted(((k, v) for k, v in pw_genes.items() if len(v) >= min_genes),
-                 key=lambda kv: -len(kv[1]))[:max_pathways]
+                 key=lambda kv: (-len(kv[1]), kv[0]))[:max_pathways]
     if not top:
         raise RuntimeError("no Reactome pathways matched the gene list")
     names = [pw_name[k] for k, _ in top]
@@ -66,17 +71,22 @@ def _fallback(genes: list[str], n_pathways: int = N_PATHWAYS_FALLBACK, seed: int
 def build_pathways(dataset: str, max_pathways: int = 40) -> sp.csr_matrix:
     """Build the gene->pathway (N,P) bool matrix and persist it to ``priors/<dataset>/``.
 
-    Uses Reactome if ``Ensembl2Reactome_All_Levels.txt`` is present, else a seeded fallback.
+    Uses Reactome if ``Ensembl2Reactome_All_Levels.txt`` is present, else a deterministic
+    seeded fallback. On fallback a :class:`UserWarning` is emitted so a downstream metric is
+    never silently based on a random pathway assignment.
     """
     genes = load_genes(dataset)
     rfile = PRIORS_ROOT / "Ensembl2Reactome_All_Levels.txt"
-    try:
-        if not rfile.exists():
-            raise FileNotFoundError("reactome file absent")
+    if rfile.exists():
+        # Parsing / matching errors should propagate; only the missing-file case falls back.
         m, names, source = _from_reactome(genes, max_pathways)
-    except Exception as e:
+    else:
+        warnings.warn(
+            f"Reactome dump not found at {rfile}; using seeded random pathway assignment. "
+            "Downstream MoE pathway prior is NOT real biology.",
+            UserWarning, stacklevel=2,
+        )
         m, names, source = _fallback(genes)
-        source = f"fallback({type(e).__name__})"
 
     pri = priors_dir(dataset)
     sp.save_npz(pri / "pathways.npz", m)

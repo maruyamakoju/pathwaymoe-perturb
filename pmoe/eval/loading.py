@@ -39,18 +39,26 @@ def load_model_for_eval(run: RunSpec, dataset: str, variant, split, device):
             moe=MoEConfig(**raw_cfg["moe"])
         )
     else:
-        # Old flat config - reconstruct using the helper
-        # We need cb_dim which might be in shared or extra. 
-        # For eval loading, we just need to reconstruct the ModelConfig object.
+        # Old flat config — reconstruct via the helper. Require the shape-defining fields
+        # (n_genes, n_experts, chemberta_dim) explicitly: silently defaulting them to
+        # 2000/40/384 would let a wrong-shape checkpoint load against a mismatched model
+        # and either produce an unhelpful state_dict mismatch deep inside torch or, worse,
+        # silently load if shapes happen to align.
+        missing = [k for k in ("n_genes", "n_experts", "chemberta_dim") if k not in raw_cfg]
+        if missing:
+            raise KeyError(
+                f"checkpoint {run.ckpt_path}: flat (v1) cfg is missing required shape keys "
+                f"{missing}; cannot reconstruct ModelConfig without silent defaults."
+            )
         cfg = make_hierarchical_config(
             dataset=dataset,
             size=run.size,
             variant=variant,
-            n_genes=raw_cfg.get("n_genes", 2000),
-            n_experts=raw_cfg.get("n_experts", 40),
-            cb_dim=raw_cfg.get("chemberta_dim", 384),
+            n_genes=raw_cfg["n_genes"],
+            n_experts=raw_cfg["n_experts"],
+            cb_dim=raw_cfg["chemberta_dim"],
             grn_propagation=raw_cfg.get("grn_propagation", False),
-            use_grn_mask=raw_cfg.get("use_grn_mask", True)
+            use_grn_mask=raw_cfg.get("use_grn_mask", True),
         )
 
     grn = load_grn(dataset, variant, split)

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -25,7 +26,7 @@ try:
     from rdkit import RDLogger
 
     RDLogger.DisableLog("rdApp.*")
-except Exception:
+except ImportError:
     pass
 
 MORGAN_BITS = 2048
@@ -35,50 +36,60 @@ CHEMBERTA_DIM = 384
 def morgan_fp(smiles: str, bits: int = MORGAN_BITS) -> np.ndarray:
     """Morgan (ECFP4) fingerprint as a dense float32 bit vector.
 
-    Falls back to a deterministic md5-seeded sparse vector when RDKit cannot parse the SMILES.
+    Falls back to a deterministic md5-seeded sparse vector ONLY when RDKit is absent
+    (``ImportError``); a parse failure on a present-but-invalid SMILES is treated as the
+    empty molecule (zero vector). Other RDKit errors propagate so users see them.
     """
     try:
         from rdkit import Chem
         from rdkit.Chem import AllChem
-
-        m = Chem.MolFromSmiles(smiles) if smiles else None
-        if m is None:
-            return np.zeros(bits, np.float32)
-        bv = AllChem.GetMorganFingerprintAsBitVect(m, 2, bits)
-        arr = np.zeros(bits, np.int8)
         from rdkit.DataStructs import ConvertToNumpyArray
-
-        ConvertToNumpyArray(bv, arr)
-        return arr.astype(np.float32)
-    except Exception:
-        # hash-based fallback fingerprint (deterministic)
-        h = int(hashlib.md5((smiles or "").encode()).hexdigest(), 16)
+    except ImportError:
+        # hash-based fallback fingerprint (deterministic): used only when rdkit is unavailable.
+        h = int(hashlib.md5((smiles or "").encode(), usedforsecurity=False).hexdigest(), 16)
         rng = np.random.default_rng(h % (2 ** 32))
         v = np.zeros(bits, np.float32)
         v[rng.integers(0, bits, 30)] = 1.0
         return v
 
+    m = Chem.MolFromSmiles(smiles) if smiles else None
+    if m is None:
+        return np.zeros(bits, np.float32)
+    bv = AllChem.GetMorganFingerprintAsBitVect(m, 2, bits)
+    arr = np.zeros(bits, np.int8)
+    ConvertToNumpyArray(bv, arr)
+    return arr.astype(np.float32)
+
 
 def _chemberta(smiles_list: list[str]) -> tuple[np.ndarray | None, str]:
-    """Embed SMILES with ChemBERTa CLS token. Returns (None, reason) if unavailable."""
+    """Embed SMILES with ChemBERTa CLS token. Returns (None, reason) when unavailable.
+
+    Only ``ImportError`` (transformers/torch missing) and ``OSError`` (model file download
+    failed / HF cache unreachable) are caught — these are the legitimate offline-fallback
+    cases. Other exceptions (token shape mismatch, OOM, ...) propagate so they don't
+    silently downgrade the pipeline to a random projection.
+    """
     try:
         import torch
         from transformers import AutoModel, AutoTokenizer
+    except ImportError as e:
+        return None, f"fallback:ImportError:{e}"
 
-        name = "DeepChem/ChemBERTa-77M-MLM"
+    name = "DeepChem/ChemBERTa-77M-MLM"
+    try:
         tok = AutoTokenizer.from_pretrained(name)
         mdl = AutoModel.from_pretrained(name).eval()
-        embs = []
-        with torch.no_grad():
-            for i in range(0, len(smiles_list), 32):
-                batch = [s if s else "C" for s in smiles_list[i:i + 32]]
-                enc = tok(batch, return_tensors="pt", padding=True, truncation=True, max_length=128)
-                out = mdl(**enc).last_hidden_state[:, 0]  # CLS
-                embs.append(out.cpu().numpy())
-        E = np.concatenate(embs).astype(np.float32)
-        return E, f"chemberta:{name}"
-    except Exception as e:
-        return None, f"fallback:{type(e).__name__}"
+    except OSError as e:
+        return None, f"fallback:OSError:{e}"
+
+    embs = []
+    with torch.no_grad():
+        for i in range(0, len(smiles_list), 32):
+            batch = [s if s else "C" for s in smiles_list[i:i + 32]]
+            enc = tok(batch, return_tensors="pt", padding=True, truncation=True, max_length=128)
+            out = mdl(**enc).last_hidden_state[:, 0]  # CLS
+            embs.append(out.cpu().numpy())
+    return np.concatenate(embs).astype(np.float32), f"chemberta:{name}"
 
 
 def build_drug_feats(dataset: str) -> pd.DataFrame:
@@ -94,6 +105,12 @@ def build_drug_feats(dataset: str) -> pd.DataFrame:
 
     cb, source = _chemberta(smiles)
     if cb is None:
+        warnings.warn(
+            f"ChemBERTa unavailable ({source}); falling back to a deterministic random "
+            "projection of the Morgan fingerprint. Downstream chemistry features are NOT "
+            "real ChemBERTa embeddings — do not cite numbers computed under this fallback.",
+            UserWarning, stacklevel=2,
+        )
         rng = np.random.default_rng(SEED)
         proj = rng.standard_normal((MORGAN_BITS, CHEMBERTA_DIM)).astype(np.float32) / np.sqrt(MORGAN_BITS)
         cb = (morgan @ proj).astype(np.float32)
