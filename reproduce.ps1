@@ -2,6 +2,9 @@
 # Real-data steps assume the Tahoe-100M subset has been built (code\preprocess_tahoe_stream.py).
 $ErrorActionPreference = "Stop"
 $env:VC_DATA_ROOT = "E:\vc_project_data"; $env:PYTHONUNBUFFERED = "1"
+# Workspace size for CuBLAS deterministic matmul (silences the use_deterministic_algorithms warning
+# on Linear/MoE matmuls). Required for fully bit-reproducible training runs; harmless otherwise.
+$env:CUBLAS_WORKSPACE_CONFIG = ":4096:8"
 $py = ".\.venv\Scripts\python.exe"
 
 Write-Host "== tests ==" -ForegroundColor Cyan
