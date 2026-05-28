@@ -287,15 +287,19 @@ class CrossAttention(nn.Module):
     """Perturbation Cross-Attention Layer.
 
     Enables gene tokens to attend to the perturbation embedding context.
+
+    Submodule names (``q``, ``kv``, ``proj``) match the v1 checkpoint layout so the
+    existing E:\\vc_project_data\\checkpoints can be loaded into this v2 model without
+    a key-remap shim. Renaming these would silently break checkpoint compatibility.
     """
 
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.num_heads = cfg.n_heads
         self.head_dim = cfg.d_model // cfg.n_heads
-        self.q_proj = nn.Linear(cfg.d_model, cfg.d_model)
-        self.kv_proj = nn.Linear(cfg.d_model, 2 * cfg.d_model)
-        self.out_proj = nn.Linear(cfg.d_model, cfg.d_model)
+        self.q = nn.Linear(cfg.d_model, cfg.d_model)
+        self.kv = nn.Linear(cfg.d_model, 2 * cfg.d_model)
+        self.proj = nn.Linear(cfg.d_model, cfg.d_model)
         self.dropout_p = cfg.dropout
 
     def forward(self, x: torch.Tensor, context: torch.Tensor) -> torch.Tensor:
@@ -306,13 +310,13 @@ class CrossAttention(nn.Module):
         """
         b, n, d = x.shape
         m = context.shape[1]
-        
-        q = self.q_proj(x).reshape(b, n, self.num_heads, self.head_dim).transpose(1, 2)
-        kv = self.kv_proj(context).reshape(b, m, 2, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
+
+        q = self.q(x).reshape(b, n, self.num_heads, self.head_dim).transpose(1, 2)
+        kv = self.kv(context).reshape(b, m, 2, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
         k, v = kv[0], kv[1]
-        
+
         p = self.dropout_p if self.training else 0.0
         output = F.scaled_dot_product_attention(q, k, v, dropout_p=p)
-        
+
         output = output.transpose(1, 2).reshape(b, n, d)
-        return self.out_proj(output)
+        return self.proj(output)

@@ -13,7 +13,7 @@ Data manifest: {"dataset": "synthetic", "n_genes": 2000, "n_conditions": 1410, "
 | **MoE / GRN=none** | **0.596** | [0.305, 0.856] |
 | **MoE / GRN=random** | **0.595** | [0.308, 0.858] |
 | **MoE / GRN=coexpr** | **0.593** | [0.298, 0.853] |
-| **MoE / GRN=coexpr_lfc** | **0.594** | [0.304, 0.852] |
+| **MoE / GRN=coexpr_lfc** | **0.594** | [0.303, 0.852] |
 | **MoE / GRN=ground_truth** | **0.610** | [0.319, 0.869] |
 | GRN-prop / GRN=random | 0.167 | [0.093, 0.232] |
 | GRN-prop / GRN=coexpr | 0.167 | [0.093, 0.232] |
@@ -25,7 +25,7 @@ Data manifest: {"dataset": "synthetic", "n_genes": 2000, "n_conditions": 1410, "
 | contrast | Δ DEG-Pearson | 95% CI | p (Holm) | significant&meaningful |
 |---|---|---|---|---|
 | random_vs_none | -0.001 | [-0.012, +0.010] | 1.000 | no |
-| coexpr_vs_none | -0.003 | [-0.014, +0.006] | 1.000 | no |
+| coexpr_vs_none | -0.003 | [-0.013, +0.006] | 1.000 | no |
 | coexpr_lfc_vs_none | -0.002 | [-0.011, +0.007] | 1.000 | no |
-| ground_truth_vs_none | +0.014 | [-0.001, +0.029] | 0.340 | no |
-| coexpr_lfc_vs_random | -0.001 | [-0.020, +0.015] | 1.000 | no |
+| ground_truth_vs_none | +0.014 | [-0.001, +0.029] | 0.347 | no |
+| coexpr_lfc_vs_random | -0.001 | [-0.020, +0.014] | 1.000 | no |

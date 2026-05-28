@@ -57,13 +57,35 @@ def load_model_for_eval(run: RunSpec, dataset: str, variant, split, device):
 
     try:
         gene_pathway, _ = load_pathways(dataset)
-    except Exception:
+    except FileNotFoundError:
         gene_pathway = None
 
     model = PathwayMoEPerturb(cfg, grn, gene_pathway).to(device)
-    model.load_state_dict(ck["model"])
+    state = _remap_state_dict(ck["model"])
+    model.load_state_dict(state)
     model.eval()
     return model
+
+
+# Older checkpoints (mostly the pre-2026-05 unseen_drug runs) use the v1 CrossAttention
+# submodule names q/kv/proj; the brief v2 rename to q_proj/kv_proj/out_proj was reverted
+# but a handful of unseen_cell_line / unseen_both checkpoints were trained during the
+# rename window. Normalize both layouts to the current (v1) names before load_state_dict.
+_CROSS_KEY_REMAP = {".cross.q_proj.": ".cross.q.",
+                    ".cross.kv_proj.": ".cross.kv.",
+                    ".cross.out_proj.": ".cross.proj."}
+
+
+def _remap_state_dict(state: dict) -> dict:
+    out = {}
+    for k, v in state.items():
+        nk = k
+        for old, new in _CROSS_KEY_REMAP.items():
+            if old in nk:
+                nk = nk.replace(old, new)
+                break
+        out[nk] = v
+    return out
 
 
 def predict_test(run: RunSpec, dataset: str, df, shared: dict, test_idx: np.ndarray,

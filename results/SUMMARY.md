@@ -24,18 +24,18 @@ mechanism?** We hold a fixed model (a pathway Mixture-of-Experts with gene-token
 
 | Regime | no-GRN | + GRN | Δ (Holm-p) |
 |---|---|---|---|
-| Real Tahoe-100M (shared targets) | 0.630 | 0.623–0.629 (any variant) | ≤ +0.004, **ns** |
+| Real Tahoe-100M (shared targets) | 0.629 | 0.622–0.628 (any variant) | ≤ +0.004, **ns** |
 | Synthetic, shared targets, **true GRN** | 0.596 | 0.610 | +0.014, **ns** |
-| Synthetic, novel targets, **true GRN** | 0.368 | 0.432 | +0.063, **ns** |
+| Synthetic, novel targets, **true GRN** | 0.313 | 0.342 | +0.029, **ns** |
 
 Where OOD prediction is **feasible** (real data, shared targets), a GRN prior — generic, weighted,
 data-derived, or even the **ground-truth** GRN — confers **no significant benefit**: a flexible model
 learns the perturbation response directly, so the structural prior is **redundant**. The true GRN only
-*hints* at helping for **novel targets** (+0.06), a near-unpredictable regime where the effect is not
-significant. The **injection mechanism does not matter** (mask ≈ message-passing).
+*weakly hints* at helping for **novel targets** (+0.02–0.03), a near-unpredictable regime where the
+effect is not significant. The **injection mechanism does not matter** (mask ≈ message-passing).
 
 Under the same leakage-free protocol, the deep PathwayMoE **does not beat the linear baselines** on
-real OOD either — it loses to ridge on unseen_cell_line (0.824 vs 0.868, p<0.001) and ties the
+real OOD either — it loses to ridge on unseen_cell_line (0.824 vs 0.868, Holm-p=0.001) and ties the
 mean-effect baseline on unseen_both (a prior V1 comparison reporting large wins was an HVG-leakage
 artifact; see `REAL_TAHOE_OOD_AUDIT.md`). So neither the GRN prior nor the architecture helps here.
 
