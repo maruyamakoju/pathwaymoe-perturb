@@ -61,8 +61,11 @@ class Split(str, Enum):
 class GRNVariant(str, Enum):
     NONE = "none"
     RANDOM = "random"
+    RANDOM_DENSE = "random_dense"  # random matched to CollecTRI density (density control)
     TRRUST = "trrust"
     TRRUST_WEIGHTED = "trrust_weighted"
+    COLLECTRI = "collectri"            # dense curated GRN (TF->target topology)
+    COLLECTRI_WEIGHTED = "collectri_weighted"  # dense curated, signed (activation +1 / repression -1)
     COEXPR = "coexpr"
     COEXPR_LFC = "coexpr_lfc"
     GROUND_TRUTH = "ground_truth"

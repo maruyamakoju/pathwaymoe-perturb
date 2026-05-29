@@ -92,6 +92,74 @@ def test_trrust_weighted_is_signed_float(tmp_path, monkeypatch):
     assert (data < 0).any(), "Repression edge should produce a negative weight"
 
 
+def _mock_collectri(tmp_path, monkeypatch):
+    """Mock CollecTRI_regulons.csv + the symbol->Ensembl vocab; return the gene list.
+
+    Fixture network: TFA->TGB activation(+1), TFA->TGC repression(-1), TFD->TGE activation(+1),
+    plus a self-loop and an out-of-space edge that must both be dropped.
+    """
+    genes = [f"ENSG{i:08d}" for i in range(20)]
+    csv_text = "source,target,weight,resources,references,sign_decision\n" + "\n".join([
+        "TFA,TGB,1.0,r,ref,PMID",
+        "TFA,TGC,-1.0,r,ref,PMID",
+        "TFD,TGE,1.0,r,ref,PMID",
+        "TFA,TFA,1.0,r,ref,PMID",          # self-loop -> dropped
+        "TFA,NOTINSPACE,1.0,r,ref,PMID",   # target not in gene space -> dropped
+    ]) + "\n"
+    vocab_text = "\n".join([
+        '{"gene_symbol":"TFA","ensembl_id":"ENSG00000000"}',
+        '{"gene_symbol":"TGB","ensembl_id":"ENSG00000001"}',
+        '{"gene_symbol":"TGC","ensembl_id":"ENSG00000002"}',
+        '{"gene_symbol":"TFD","ensembl_id":"ENSG00000003"}',
+        '{"gene_symbol":"TGE","ensembl_id":"ENSG00000004"}',
+    ]) + "\n"
+    csv_path = tmp_path / "CollecTRI_regulons.csv"; csv_path.write_text(csv_text)
+    vocab_path = tmp_path / "gene_vocabulary.jsonl"; vocab_path.write_text(vocab_text)
+    import pmoe.priors.grn as grn_mod
+    monkeypatch.setattr(grn_mod, "COLLECTRI_CSV", csv_path)
+    monkeypatch.setattr(grn_mod, "VOCAB", vocab_path)
+    return genes
+
+
+def test_collectri_topology_drops_selfloops_and_out_of_space(tmp_path, monkeypatch):
+    genes = _mock_collectri(tmp_path, monkeypatch)
+    m = build_grn("synthetic_smoke", GRNVariant.COLLECTRI, genes=genes)
+    assert m.dtype == bool
+    assert m.nnz == 3, f"expected 3 in-space edges (self-loop + out-of-space dropped), got {m.nnz}"
+
+
+def test_collectri_weighted_is_signed_float(tmp_path, monkeypatch):
+    genes = _mock_collectri(tmp_path, monkeypatch)
+    m = build_grn("synthetic_smoke", GRNVariant.COLLECTRI_WEIGHTED, genes=genes)
+    assert np.issubdtype(m.dtype, np.floating), "weighted CollecTRI must be float"
+    assert m.nnz == 3
+    assert (m.data > 0).any(), "activation edge -> positive weight"
+    assert (m.data < 0).any(), "repression edge -> negative weight"
+    # meta records the curated source as leakage-safe (carries no test info)
+    import json
+    from pmoe.config import priors_dir, grn_filename
+    meta = json.loads((priors_dir("synthetic_smoke") /
+                       (grn_filename(GRNVariant.COLLECTRI_WEIGHTED)[:-4] + ".meta.json")).read_text())
+    assert meta["leakage_safe"] is True
+    assert meta["weighted"] is True
+
+
+def test_random_dense_matches_collectri_edge_count(tmp_path, monkeypatch):
+    """random_dense defaults to the CollecTRI in-space edge count (floored at 100, like random).
+
+    On the real 2,000-HVG space CollecTRI has 2,193 edges so the floor never binds; the explicit
+    match_edges path is what the study uses to pin the density control exactly to CollecTRI.
+    """
+    genes = _mock_collectri(tmp_path, monkeypatch)
+    n_ct = build_grn("synthetic_smoke", GRNVariant.COLLECTRI, genes=genes).nnz
+    m = build_grn("synthetic_smoke", GRNVariant.RANDOM_DENSE, genes=genes, seed=3)
+    assert m.dtype == bool
+    assert m.nnz == max(n_ct, 100)            # 100-edge floor for tiny fixtures
+    m_exact = build_grn("synthetic_smoke", GRNVariant.RANDOM_DENSE,
+                        match_edges=n_ct, genes=genes, seed=3)
+    assert m_exact.nnz == n_ct                # explicit budget = exact CollecTRI density
+
+
 def test_none_is_empty():
     genes = _genes()
     m = build_grn("synthetic_smoke", GRNVariant.NONE, genes=genes)

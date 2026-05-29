@@ -38,6 +38,10 @@ from pmoe.data.loader import load_conditions, load_genes, stack_arrays
 
 VOCAB = PRIORS_ROOT.parent / "tahoe100m" / "metadata" / "gene_vocabulary.jsonl"
 TRRUST_TSV = PRIORS_ROOT / "trrust_human.tsv"
+# CollecTRI signed regulons (45,856 edges / 1,183 TFs). Downloaded from Zenodo record 8192729
+# (CollecTRI_regulons.csv) because omnipathdb.org — the package's normal source — is unreachable.
+# Columns: source,target,weight(+1 activation / -1 repression),resources,references,sign_decision.
+COLLECTRI_CSV = PRIORS_ROOT / "CollecTRI_regulons.csv"
 
 # weights for trrust_weighted edges keyed by the TRRUST `mode` column
 _W_ACT = 1.0
@@ -138,6 +142,32 @@ def _random_edges(n: int, n_edges: int, seed: int) -> set[tuple[int, int]]:
     return rand
 
 
+def _collectri_rows(genes: list[str]):
+    """Return (i, j, signed-weight) CollecTRI edges mapped into the gene space.
+
+    Symbols are mapped to Ensembl via the Tahoe vocabulary (same as TRRUST); self-loops and
+    duplicate (i, j) pairs are dropped. ``weight`` is +1.0 (activation) / -1.0 (repression)
+    from the CollecTRI ``weight`` column.
+    """
+    gidx = _gidx(genes)
+    s2e = _sym2ens()
+    net = pd.read_csv(COLLECTRI_CSV, usecols=["source", "target", "weight"])
+    rows = []
+    seen = set()
+    for s, t, w in zip(net["source"].astype(str), net["target"].astype(str), net["weight"]):
+        es, et = s2e.get(s, s), s2e.get(t, t)
+        if es in gidx and et in gidx and es != et:
+            i, j = gidx[es], gidx[et]
+            if (i, j) not in seen:
+                seen.add((i, j))
+                rows.append((i, j, float(w)))
+    return rows
+
+
+def _collectri_edges(genes: list[str]) -> set[tuple[int, int]]:
+    return {(i, j) for i, j, _ in _collectri_rows(genes)}
+
+
 def _trrust_weighted_rows(genes: list[str]):
     """(i, j, signed-weight) edges from TRRUST mode column for the weighted variant."""
     rows = []
@@ -214,6 +244,20 @@ def build_grn(
         n_edges = match_edges if match_edges is not None else max(len(_trrust_edges(genes)), 100)
         m = _build_csr(n, _random_edges(n, n_edges, seed), dtype=bool)
         source = "random_matched_density"
+
+    elif variant == GRNVariant.RANDOM_DENSE:
+        # density control for CollecTRI: same edge count, random topology
+        n_edges = match_edges if match_edges is not None else max(len(_collectri_edges(genes)), 100)
+        m = _build_csr(n, _random_edges(n, n_edges, seed), dtype=bool)
+        source = "random_matched_collectri_density"
+
+    elif variant == GRNVariant.COLLECTRI:
+        m = _build_csr(n, _collectri_edges(genes), dtype=bool)
+        source = "CollecTRI"
+
+    elif variant == GRNVariant.COLLECTRI_WEIGHTED:
+        m = _build_csr(n, _collectri_rows(genes), dtype=np.float32)
+        source = "CollecTRI_signed"
 
     elif variant == GRNVariant.GROUND_TRUTH:
         gt = sp.load_npz(priors_dir(dataset) / "grn_mask.npz").tocoo()

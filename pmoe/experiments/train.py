@@ -252,7 +252,7 @@ def make_hierarchical_config(
     )
     grn = GRNConfig(
         use_grn_mask=(v != GRNVariant.NONE) if use_grn_mask is None else use_grn_mask,
-        weighted_grn=(v == GRNVariant.TRRUST_WEIGHTED),
+        weighted_grn=(v in (GRNVariant.TRRUST_WEIGHTED, GRNVariant.COLLECTRI_WEIGHTED)),
         grn_propagation=grn_propagation,
         latent_grn=latent_grn,
         **({"latent_grn_kl_weight": latent_grn_kl_weight}

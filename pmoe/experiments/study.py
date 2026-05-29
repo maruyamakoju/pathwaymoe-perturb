@@ -34,7 +34,14 @@ def ensure_static_priors(dataset):
     except FileNotFoundError:
         build_pathways(dataset)
     load_drug_feats(dataset)
-    for v in [GRNVariant.RANDOM, GRNVariant.TRRUST, GRNVariant.TRRUST_WEIGHTED]:
+    static = [GRNVariant.RANDOM, GRNVariant.TRRUST, GRNVariant.TRRUST_WEIGHTED]
+    # CollecTRI dense-curated variants + matched-density random control require the
+    # CollecTRI_regulons.csv (Zenodo 8192729) on disk; skip cleanly if it is absent so the
+    # legacy TRRUST-only study still runs on machines without the new prior.
+    from pmoe.priors.grn import COLLECTRI_CSV
+    if COLLECTRI_CSV.exists():
+        static += [GRNVariant.COLLECTRI, GRNVariant.COLLECTRI_WEIGHTED, GRNVariant.RANDOM_DENSE]
+    for v in static:
         if load_grn(dataset, v) is None:
             build_grn(dataset, v)
     # ground_truth only if a base grn_mask exists (synthetic). Check the FILE (load_grn returns
@@ -149,7 +156,12 @@ def analyze(dataset, splits, variants, seeds, size="base", eval_device="auto"):
         # planned contrasts (paired cluster bootstrap) + Holm correction + effect sizes
         contrasts = [("random", "none"), ("trrust", "none"), ("trrust_weighted", "none"),
                      ("coexpr", "none"), ("coexpr_lfc", "none"), ("ground_truth", "none"),
-                     ("coexpr_lfc", "trrust"), ("coexpr_lfc", "random"), ("trrust", "random")]
+                     ("coexpr_lfc", "trrust"), ("coexpr_lfc", "random"), ("trrust", "random"),
+                     # CollecTRI dense-curated GRN: does GRN *quality+density* help, and is any
+                     # gain quality (vs random_dense at the same density) or just density?
+                     ("collectri", "none"), ("collectri_weighted", "none"),
+                     ("random_dense", "none"), ("collectri", "random_dense"),
+                     ("collectri", "trrust"), ("collectri_weighted", "collectri")]
         raw, details = {}, {}
         for a, b in contrasts:
             if a in pc and b in pc:
