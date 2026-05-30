@@ -32,13 +32,16 @@ proposed to improve out-of-distribution (OOD) perturbation-response prediction, 
 finding that large foundation models do not beat linear baselines~\cite{nm2025benchmark}. We ask a
 sharper question than ``does it help?'': \textbf{when, and on which kind of GRN, does it help?} We hold
 the architecture fixed and vary only the GRN prior across a quality spectrum---none, random
-(density-matched), generic curated (TRRUST), data-derived co-expression, and data-derived co-response
-(LFC correlation)---measuring effect on OOD DEG-Pearson with bootstrap CIs and paired significance
+(density-matched), generic curated (TRRUST), dense curated (CollecTRI, $4\times$ denser and signed),
+data-derived co-expression, and data-derived co-response (LFC correlation); we additionally test
+drug$\rightarrow$target mechanistic grounding---measuring effect on OOD DEG-Pearson with bootstrap CIs and paired significance
 tests. We run this on (i) a 22.6M-cell, 8{,}875-condition subset of Tahoe-100M with deep pseudobulk and
 (ii) synthetic data whose generative process \emph{is} GRN propagation, in two regimes (targets shared
 with vs.\ held out from training). \textbf{Result:} with leakage-free GRNs and cluster-bootstrap
-statistics, \textbf{no GRN prior---generic, weighted, or data-derived---significantly improves real-data
-OOD prediction} (all $|\Delta\,\text{DEG-Pearson}|\le 0.007$, Holm-$p>0.1$). Moreover, under the same
+statistics, \textbf{no GRN prior---generic, weighted, dense curated (CollecTRI), or data-derived---significantly
+improves real-data OOD prediction} (all $|\Delta\,\text{DEG-Pearson}|\le 0.01$, Holm-$p>0.2$); CollecTRI
+is statistically indistinguishable from a random graph at the same density ($\Delta=+0.001$, ns), and
+drug$\rightarrow$target mechanistic grounding is likewise null ($\Delta=+0.003$, $p=0.93$). Moreover, under the same
 leakage-free protocol the deep PathwayMoE does \textbf{not} robustly beat the linear baselines either:
 across three OOD splits it loses to ridge on \texttt{unseen\_cell\_line} ($0.824$ vs $0.868$, Holm-$p\!=\!0.001$),
 ties the mean-effect baseline on \texttt{unseen\_both} ($0.581$ vs $0.607$, ns), and shows only a small
@@ -173,17 +176,30 @@ MoE / GRN = TRRUST & 0.626 & [0.545, 0.697] \\
 MoE / GRN = TRRUST weighted & 0.628 & [0.546, 0.698] \\
 MoE / GRN = co-expr (train-only) & 0.625 & [0.542, 0.695] \\
 MoE / GRN = co-response/LFC (train-only) & 0.624 & [0.544, 0.695] \\
+MoE / GRN = \textbf{CollecTRI} (4$\times$ denser, signed) & 0.624 & [0.543, 0.695] \\
+MoE / GRN = CollecTRI weighted (signed bias) & 0.619 & [0.537, 0.691] \\
+MoE / GRN = random @ CollecTRI density & 0.624 & [0.548, 0.691] \\
+MoE / GRN = none $+$ drug$\rightarrow$target & 0.632 & [0.569, 0.689] \\
 \bottomrule
 \end{tabular}
-\caption{Real Tahoe \texttt{unseen\_drug}: GRN quality does not move accuracy.}
+\caption{Real Tahoe \texttt{unseen\_drug}: neither GRN quality/density nor drug$\rightarrow$target
+mechanistic grounding moves accuracy.}
 \end{table}
 
 Planned contrasts (paired cluster bootstrap, Holm-corrected): \textbf{every} GRN variant vs none is
-within $\pm0.007$ with Holm-$p>0.1$---none significant, none meaningful ($|\Delta|\ge0.01$). The
+within $\pm0.01$ with Holm-$p>0.2$---none significant, none meaningful ($|\Delta|\ge0.01$). The
 data-derived co-response GRN---the variant a leaky analysis would have favoured---is $\Delta=-0.005$
-($p=0.60$) vs none. On \texttt{unseen\_drug} the deep MoE ($\sim$0.63) shows a small numerical edge over
-the linear baselines (0.58--0.60) but with heavily overlapping cluster CIs (MoE 0.629 [0.551,0.697] vs
-B1 0.601 [0.537,0.655])---not a significant win. The null is summarized across all three regimes in
+($p=0.95$) vs none. \textbf{Dense, curated, signed CollecTRI closes the ``TRRUST was too sparse''
+objection}: with 2{,}193 in-space edges ($4\times$ TRRUST's 539) it is $\Delta=-0.005$ vs none and
+$\Delta=+0.001$ (Holm-$p=1.0$) vs a \emph{random} graph at the same density---indistinguishable from
+random rewiring; edge sign does not help ($\Delta=-0.005$ weighted vs CollecTRI, ns). A complementary
+prior, \textbf{drug$\rightarrow$target mechanistic grounding} (which gene each drug hits; 58/212 drugs
+have an in-space target), is likewise null: $\Delta=+0.003$ (CI $[-0.086,+0.091]$, $p=0.93$), despite
+a strong in-distribution signal that does not transfer, and a synthetic positive control confirming
+the target pathway is functional ($\Delta=+0.25$, $p<0.001$ under target ablation). On
+\texttt{unseen\_drug} the deep MoE ($\sim$0.63) shows a small numerical edge over the linear baselines
+(0.58--0.60) but with heavily overlapping cluster CIs (MoE 0.629 [0.551,0.697] vs B1 0.601
+[0.537,0.655])---not a significant win. The null is summarized across all three regimes in
 Figure~\ref{fig:money}.
 
 \begin{figure}[h]\centering
