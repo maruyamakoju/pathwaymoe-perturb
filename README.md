@@ -4,8 +4,8 @@ A leakage-audited, statistically rigorous study of whether a **gene-regulatory-n
 inductive bias** improves *out-of-distribution* single-cell perturbation prediction — motivated by
 the 2025 *Nature Methods* finding that billion-parameter foundation models do not beat linear
 baselines. We hold the architecture fixed and vary only the **GRN quality** (none → random → curated
-TRRUST → weighted → data-derived co-expression/co-response → ground-truth) and the **injection
-mechanism** (hard attention mask vs soft GNN message-passing).
+TRRUST → weighted → dense curated CollecTRI → data-derived co-expression/co-response → ground-truth)
+and the **injection mechanism** (hard attention mask vs soft GNN message-passing).
 
 ## TL;DR finding
 

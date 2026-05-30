@@ -155,17 +155,24 @@ DEG-Pearson@50 with **cluster-bootstrap** 95% CIs (resampling drugs). 3 seeds pe
 |---|---|---|
 | baseline B1 mean-effect | 0.601 | [0.537, 0.655] |
 | baseline B2/B3 ridge | 0.582 | [0.507, 0.646] |
-| MoE / GRN = none | 0.629 | [0.551, 0.697] |
-| MoE / GRN = random | 0.622 | [0.538, 0.694] |
-| MoE / GRN = TRRUST | 0.626 | [0.545, 0.697] |
-| MoE / GRN = TRRUST weighted | 0.628 | [0.546, 0.698] |
-| MoE / GRN = co-expr (train-only) | 0.625 | [0.542, 0.695] |
-| MoE / GRN = co-response/LFC (train-only) | 0.624 | [0.544, 0.695] |
+| MoE / GRN = none | 0.630 | [0.551, 0.697] |
+| MoE / GRN = random (matched TRRUST density) | 0.623 | [0.538, 0.694] |
+| MoE / GRN = TRRUST | 0.627 | [0.545, 0.697] |
+| MoE / GRN = TRRUST weighted | 0.629 | [0.546, 0.698] |
+| MoE / GRN = co-expr (train-only) | 0.626 | [0.542, 0.695] |
+| MoE / GRN = co-response/LFC (train-only) | 0.625 | [0.544, 0.695] |
+| MoE / GRN = **CollecTRI** (4× denser, signed, curated) | 0.626 | [0.544, 0.696] |
+| MoE / GRN = CollecTRI weighted (signed bias) | 0.623 | [0.540, 0.694] |
+| MoE / GRN = random @ CollecTRI density | 0.626 | [0.544, 0.697] |
 
 Planned contrasts (paired cluster bootstrap, Holm-corrected): **every** GRN variant vs none is within
 ±0.007 with Holm-p > 0.1 — none significant, none meaningful (|Δ|≥0.01). Notably the data-derived
 co-response GRN — the variant a leaky analysis would have favoured — is Δ = **−0.005 (p=0.52)** vs none
-and −0.003 (p=0.83) vs TRRUST. On unseen_drug the deep MoE (~0.63) shows a small numerical edge over
+and −0.003 (p=0.83) vs TRRUST. **Dense, curated, signed CollecTRI closes the "TRRUST was too sparse"
+objection**: at 2,193 in-space edges (4× TRRUST's 539) it is Δ = −0.004 (Holm-p=1.0) vs none and —
+decisively — Δ = **−0.0001 (Holm-p=1.0)** vs a *random* graph at the same density, i.e. statistically
+and numerically indistinguishable from random rewiring. Edge sign does not help either (CollecTRI
+weighted vs CollecTRI Δ = −0.003, ns). Neither GRN density, curation, nor sign moves OOD accuracy. On unseen_drug the deep MoE (~0.63) shows a small numerical edge over
 the linear baselines (0.58–0.60) but with heavily overlapping cluster CIs (MoE 0.629 [0.551,0.697] vs
 B1 0.601 [0.537,0.655]) — not a significant win; and the **GRN attention mask contributes nothing
 measurable, at any quality level**.
