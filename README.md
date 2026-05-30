@@ -21,6 +21,15 @@ and the **injection mechanism** (hard attention mask vs soft GNN message-passing
 | mean-effect (B1) | 0.601 |
 | PathwayMoE, **no GRN** | **0.629** |
 | PathwayMoE, TRRUST / weighted / co-expr / co-response / random | 0.622–0.628 (all Δ vs none ≤0.007, ns) |
+| PathwayMoE, **CollecTRI** (4× denser, signed, curated) | 0.624 (Δ −0.005 vs none, ns) |
+| PathwayMoE, random @ CollecTRI density | 0.624 (Δ vs CollecTRI = **+0.001**, ns) |
+| PathwayMoE, **no GRN + drug→target** | 0.632 (Δ +0.003, p=0.93, ns) |
+
+> The "TRRUST was too sparse" objection is closed: a 4×-denser signed curated GRN (CollecTRI) is
+> indistinguishable from random rewiring at the same density (Δ=+0.001, ns). And drug→target
+> mechanistic grounding — the one prior we hadn't tried — is also null on OOD (Δ=+0.003, ns), though
+> a synthetic positive control confirms the target pathway is functional. Neither regulatory-graph
+> structure nor mechanistic target grounding moves OOD-to-novel-drug accuracy here.
 
 Full numbers, synthetic positive control, and discussion: [`results/PAPER.md`](results/PAPER.md).
 One-page summary + the money figure: [`results/SUMMARY.md`](results/SUMMARY.md).
