@@ -43,3 +43,39 @@ def test_morgan_fp_returns_zero_vector_for_empty_smiles():
     assert v.shape == (drugs_mod.MORGAN_BITS,)
     assert v.sum() == 0.0
     assert v.dtype == np.float32
+
+
+def test_build_drug_targets_maps_primary_in_space_target(tmp_path, monkeypatch):
+    """build_drug_targets picks the FIRST target gene that lands in the dataset gene space,
+    leaves out-of-space / unknown-target drugs empty, and load_drug_targets drops the empties."""
+    import pmoe.priors.grn as grn_mod
+    import pmoe.data.loader as loader_mod
+
+    genes = ["ENSG0001", "ENSG0002", "ENSG0003"]
+    sym2ens = {"JAK1": "ENSG0001", "EGFR": "ENSG0002", "OFFSPACE": "ENSG9999"}
+
+    # Tahoe-style drug metadata: D1->JAK1 (in space), D2->OFFSPACE (out), D3 multi (TooX then EGFR),
+    # D4 unknown target.
+    meta = pd.DataFrame({
+        "drug": ["D1", "D2 (citrate)", "D3", "D4"],
+        "targets": ["JAK1", "OFFSPACE", "TooX, EGFR", "None"],
+        "canonical_smiles": ["c1", "c2", "c3", "c4"],
+    })
+    meta_path = tmp_path / "tahoe_drug_metadata.parquet"
+    meta.to_parquet(meta_path)
+
+    feats = pd.DataFrame({"treatment": ["D1", "D2", "D3", "D4"],
+                          "smiles": ["c1", "c2", "c3", "c4"]})
+    monkeypatch.setattr(drugs_mod, "load_drug_feats", lambda ds: feats)
+    monkeypatch.setattr(loader_mod, "load_genes", lambda ds: genes)
+    monkeypatch.setattr(grn_mod, "_sym2ens", lambda: sym2ens)
+
+    out = drugs_mod.build_drug_targets("synthetic_smoke", drug_meta_path=meta_path)
+    m = dict(zip(out["treatment"], out["target_gene"]))
+    assert m["D1"] == "ENSG0001"          # direct in-space target
+    assert m["D2"] == ""                   # out-of-space target dropped
+    assert m["D3"] == "ENSG0002"          # first in-space of a multi-target list (EGFR)
+    assert m["D4"] == ""                   # unknown target
+
+    loaded = drugs_mod.load_drug_targets("synthetic_smoke")
+    assert loaded == {"D1": "ENSG0001", "D3": "ENSG0002"}   # empties dropped
