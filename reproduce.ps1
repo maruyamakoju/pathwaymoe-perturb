@@ -24,8 +24,16 @@ Write-Host "== synthetic (novel-target) mechanism: mask vs soft message-passing 
 
 Write-Host "== real Tahoe-100M (requires built subset) ==" -ForegroundColor Cyan
 # & $py -m pmoe.data.preprocess_tahoe --dataset tahoe_full --n-hvg 2000   # build from shards first
+# GRN-quality spectrum incl. dense curated CollecTRI + matched-density random control.
+# CollecTRI needs CollecTRI_regulons.csv under <priors> (Zenodo 8192729; omnipathdb.org is down).
+# batch=48 fits the 4090 at 24GB; analyze on CPU to keep eval bit-reproducible (AUDIT.md N).
 & $py -m pmoe.experiments.study --dataset tahoe_full --splits unseen_drug `
-      --variants none random trrust trrust_weighted coexpr coexpr_lfc --seeds 1337 1 2 --epochs 25 --batch 96
+      --variants none random trrust trrust_weighted coexpr coexpr_lfc collectri collectri_weighted random_dense `
+      --seeds 1337 1 2 --epochs 25 --batch 48 --eval-device cpu
 & $py -m pmoe.eval.report --dataset tahoe_full
 
-Write-Host "DONE. See results\PAPER.md, results\study_*_v2.json, results\fig_grn_study_*_v2.png" -ForegroundColor Green
+Write-Host "== drug->target mechanistic grounding (with_targets) ==" -ForegroundColor Cyan
+# Needs tahoe_drug_metadata.parquet under <priors> (HF tahoebio/Tahoe-100M, config drug_metadata).
+& $py -m pmoe.experiments.drug_target --dataset tahoe_full --split unseen_drug --seeds 1337 1 2 --batch 48
+
+Write-Host "DONE. See results\PAPER.md, results\study_*_v2.json, results\drug_target_*.json, results\fig_grn_study_*_v2.png" -ForegroundColor Green
