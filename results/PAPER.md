@@ -181,6 +181,42 @@ This null is visualized per regime in **`fig_grn_study_tahoe_full_v2.png`**, and
 three regimes (real Tahoe, synthetic shared- and novel-target) in the headline
 **`fig_money_grn_effect.png`**.
 
+### 3.1c Drug→target mechanistic grounding — also null on real OOD
+
+The GRN-quality sweep asks whether *gene–gene regulatory structure* helps. A complementary form of
+biological prior knowledge is *which gene each drug hits* — drug→target mechanistic grounding. The
+architecture already ingests a per-condition target-gene embedding (concatenated into the
+perturbation MLP); on real Tahoe it had simply never been populated. We annotate targets from the
+Tahoe `drug_metadata` resource (HF `tahoebio/Tahoe-100M`): 58/212 drugs have at least one target
+inside the 2,000-HVG space, covering 25.2% of conditions. The target is external knowledge, not
+derived from test expression, so it is leakage-free even on unseen_drug.
+
+| Model (unseen_drug, 39 clusters, 3 seeds, CPU-deterministic) | DEG-Pearson@50 | Δ vs none |
+|---|---|---|
+| none | 0.629 | — |
+| none + drug→target | 0.632 | **+0.003 (CI [−0.086, +0.091], p=0.93)** |
+
+The gain is +0.003 — below the pre-registered 0.01 minimum effect and far from significant. Notably
+the in-distribution signal was strong (validation DEG50 ≈ 0.94 vs ≈ 0.92 for none), but it did **not
+transfer** to the OOD test set: a textbook in-distribution-only gain.
+
+Two robustness checks confirm this is a real null, not an artifact:
+- **Coverage is intrinsic, not a matching bug.** Only 136/212 drugs appear in `drug_metadata` with
+  any target, and the 2,000-HVG space excludes most drug targets; better name/SMILES matching raises
+  coverage from 57 to 58 drugs. So the partial annotation is a property of the HVG benchmark, not a
+  fixable pipeline gap. Even restricting to the 670/1,708 *covered* test conditions, drug→target is
+  Δ = **−0.028 (p=0.74, 14 clusters)** — no hidden benefit masked by dilution.
+- **The target pathway is functional (positive control).** On synthetic_hard_big (novel-target
+  regime, where each drug hits a distinct target that IS the generative signal), ablating
+  `target_idx` to −1 collapses DEG50 from **0.313 → 0.061 (Δ=+0.252, p=0.0005)** — the model
+  demonstrably uses the target embedding when it carries signal, so the real-Tahoe null reflects
+  biology/coverage, not dead plumbing.
+
+**Takeaway.** Both forms of biological prior we can inject here — regulatory-graph structure (any
+quality, including dense curated CollecTRI) and drug→target mechanistic grounding — are null for
+OOD-to-novel-drug on real Tahoe. The negative is broad and consistent across the kinds of prior
+knowledge a practitioner would reach for first.
+
 ### 3.1b The deep model does not beat linear baselines on the harder OOD splits
 Re-running the two harder OOD splits under the same leakage-free protocol (variant=none, 3 seeds,
 deterministic fp32 eval, cluster bootstrap; `results/REAL_TAHOE_OOD_AUDIT.md`) overturns an earlier
