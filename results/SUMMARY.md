@@ -12,26 +12,33 @@ mechanism?** We hold a fixed model (a pathway Mixture-of-Experts with gene-token
 
 ## Method (what makes it trustworthy)
 - **GRN-quality spectrum**, matched edge density: none / random / curated (TRRUST, binary &
-  signed-weighted) / data-derived co-expression & co-response / synthetic ground-truth.
+  signed-weighted) / **dense curated (CollecTRI, 4× denser & signed)** / data-derived co-expression &
+  co-response / synthetic ground-truth — plus **drug→target mechanistic grounding** (which gene each drug hits).
 - **Two injection mechanisms**: hard attention mask vs soft GNN message-passing.
 - **No leakage**: data-derived GRNs built from *training conditions only*, per split (regression-tested).
 - **Cluster bootstrap** over drugs/cell-lines (the real independent units) + Holm correction +
-  pre-registered minimum meaningful effect (0.01); deterministic fp32 eval; headline re-verified by
-  direct recompute. 44 tests. Data: 22.66M-cell Tahoe-100M subset (8,875 conditions × 2,000 HVGs).
+  pre-registered minimum meaningful effect (0.01); deterministic CPU eval; headline re-verified by
+  direct recompute. 67 tests. Data: 22.66M-cell Tahoe-100M subset (8,875 conditions × 2,000 HVGs).
 
 ## Result
 ![GRN effect across regimes](fig_money_grn_effect.png)
 
 | Regime | no-GRN | + GRN | Δ (Holm-p) |
 |---|---|---|---|
-| Real Tahoe-100M (shared targets) | 0.629 | 0.622–0.628 (any variant) | ≤ +0.004, **ns** |
+| Real Tahoe-100M (shared targets) | 0.629 | 0.619–0.628 (any variant, incl. CollecTRI) | within ±0.01, **ns** |
+| Real Tahoe, **CollecTRI vs random @ same density** | 0.624 | 0.624 | +0.001, **ns** |
+| Real Tahoe, **+ drug→target grounding** | 0.629 | 0.632 | +0.003, **ns** (p=0.93) |
 | Synthetic, shared targets, **true GRN** | 0.596 | 0.610 | +0.014, **ns** |
 | Synthetic, novel targets, **true GRN** | 0.317 | 0.396 | +0.079, **ns** |
 
 Where OOD prediction is **feasible** (real data, shared targets), a GRN prior — generic, weighted,
-data-derived, or even the **ground-truth** GRN — confers **no significant benefit**: a flexible model
-learns the perturbation response directly, so the structural prior is **redundant**. The true GRN
-*plausibly* helps for **novel targets** (+0.05–0.08, meaningful but ns), a near-unpredictable
+**dense curated (CollecTRI)**, data-derived, or even the **ground-truth** GRN — confers **no significant
+benefit**: a flexible model learns the perturbation response directly, so the structural prior is
+**redundant**. CollecTRI (4× denser than TRRUST, signed) is indistinguishable from a *random* graph at
+the same density (Δ=+0.001), closing the "the curated GRN was just too sparse" objection. A different
+kind of prior — **drug→target mechanistic grounding** — is also null on OOD (Δ=+0.003, p=0.93), even
+though a synthetic positive control confirms the target pathway is functional (target ablation Δ=+0.25).
+The true GRN *plausibly* helps for **novel targets** (+0.05–0.08, meaningful but ns), a near-unpredictable
 regime where the effect is not significant at the 39-cluster sample size. The **injection mechanism does not matter** (mask ≈ message-passing).
 
 Under the same leakage-free protocol, the deep PathwayMoE **does not beat the linear baselines** on
