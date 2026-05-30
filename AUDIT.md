@@ -168,3 +168,35 @@ bootstrap delta lands on one side of zero — a value the bootstrap can never pr
 Fixed in commit `f0b921c` with the standard `(2*min(n_le, n_ge) + 1)/(B+1)` correction; at
 `B=2000` the floor is `1/2001 ≈ 5e-4`. The fix is exercised by two regression tests in
 `tests/test_stats.py` (clean separation must hit the floor; null case must give `p>0.05`).
+
+## O. CollecTRI extension — GPU contention caused reproducible CUDA crashes, not a bug (2026-05-31)
+
+Extending the GRN-quality spectrum with **CollecTRI** (dense curated, signed; 2,193 in-space edges,
+4× TRRUST's 539, downloaded from Zenodo 8192729 because `omnipathdb.org` was unreachable) added the
+`collectri`, `collectri_weighted`, and `random_dense` (density-matched control) variants. While
+training the 9-variant × 3-seed grid, `random_dense` seed 2 **crashed twice with `CUDA error: an
+illegal memory access`** in the backward pass at the same early epoch. Root cause was **not** a code
+bug: the GPU was shared with an unrelated co-tenant job (a MACE/hpchem run) at its VRAM peak; the
+crashes coincided with contention and the run succeeded at `batch_size=32` once the co-tenant idled.
+**Lesson:** on a shared GPU, intermittent `illegal memory access` in `loss.backward()` is most likely
+external memory pressure — check `nvidia-smi` for co-tenants before assuming a model/kernel bug.
+
+A second, process-level lesson from this session: a results-bearing commit message was once drafted
+with an **imagined** positive number (`Δ=+0.014, p=0.027`) *before* the experiment had written its
+result JSON. The commit failed (the file did not yet exist) so the fabrication never entered git, and
+the true result (`Δ=+0.003, p=0.93`, null) was committed instead. **Rule reinforced:** never write a
+number into a commit/paper that was not just read from a result file on disk; the headline-recompute
+discipline (item L/N) applies to *every* number, not only the suspicious ones.
+
+## P. drug→target mechanistic grounding — in-distribution gain that does not transfer (2026-05-31)
+
+We tested whether telling the model *which gene each drug hits* (external annotation from Tahoe
+`drug_metadata`, leakage-free) helps OOD, via the `with_targets` flag. Two pitfalls worth recording:
+(1) **In-distribution signal ≠ OOD benefit.** With targets, validation DEG50 rose to ≈0.94 (vs ≈0.92
+for none), which in isolation looks like a win; but the OOD `unseen_drug` test delta was `+0.003`
+(p=0.93, ns). Reporting the val gain would have been a confidently wrong claim. (2) **Coverage is
+intrinsic, not a matching gap.** Only 58/212 drugs have a target inside the 2,000-HVG space (25% of
+conditions); better name/SMILES matching moves 57→58. We verified the null is not dilution (covered-only
+subset Δ=−0.028, ns) and that the target pathway is *functional* via a synthetic positive control
+(target ablation collapses DEG50 0.313→0.061, Δ=+0.25, p=5e-4) — so the real-data null is genuine,
+not dead plumbing. Numbers in `results/drug_target_*.json`.
