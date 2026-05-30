@@ -136,3 +136,76 @@ def load_drug_feats(dataset: str) -> pd.DataFrame:
     if not p.exists():
         return build_drug_feats(dataset)
     return pd.read_parquet(p)
+
+
+# --------------------------------------------------------------------------- drug -> target genes
+# Mechanistic drug->target annotation: which gene a drug actually hits. This is external biological
+# knowledge (NOT derived from test expression), so it is leakage-free even on unseen_drug. We keep it
+# in a SEPARATE file and OUT of drug_feats.parquet so the default pipeline (target_gene empty ->
+# target_idx=-1) reproduces every existing checkpoint; the with_targets flag opts in.
+DRUG_META = priors_dir.__wrapped__ if False else None  # placeholder, real path resolved in function
+
+
+def build_drug_targets(dataset: str, *, drug_meta_path=None) -> pd.DataFrame:
+    """Map each drug to its primary in-gene-space target (Ensembl) from Tahoe drug_metadata.
+
+    Source: ``priors/tahoe_drug_metadata.parquet`` (HF ``tahoebio/Tahoe-100M`` config
+    ``drug_metadata``: columns ``drug, targets, canonical_smiles, ...``). Drug names are matched
+    to this dataset's ``treatment`` values after stripping salt/form suffixes in parentheses; the
+    target column is a comma-separated list of gene SYMBOLS, mapped to Ensembl via the same Tahoe
+    vocabulary used for the GRN, and the FIRST target that lands in this dataset's gene space is
+    taken as the primary target. Drugs with no in-space target get an empty string.
+
+    Writes ``priors/<dataset>/drug_targets.parquet`` (columns ``treatment, target_gene``) and
+    returns it.
+    """
+    import re
+    from pmoe.config import PRIORS_ROOT
+    from pmoe.data.loader import load_genes
+    from pmoe.priors.grn import _sym2ens
+
+    meta_path = drug_meta_path or (PRIORS_ROOT / "tahoe_drug_metadata.parquet")
+    meta = pd.read_parquet(meta_path, columns=["drug", "targets", "canonical_smiles"])
+    genes = load_genes(dataset)
+    gset = set(genes)
+    s2e = _sym2ens()
+
+    def _norm(x: str) -> str:
+        return re.sub(r"\s*\(.*?\)\s*", "", str(x)).strip().lower()
+
+    by_name = {}
+    by_smiles = {}
+    for _, r in meta.iterrows():
+        by_name.setdefault(_norm(r["drug"]), r["targets"])
+        by_smiles.setdefault(str(r["canonical_smiles"]), r["targets"])
+
+    feats = load_drug_feats(dataset)
+    rows = []
+    for _, r in feats.iterrows():
+        tg = by_name.get(_norm(r["treatment"]))
+        if tg is None or str(tg) == "None":
+            tg = by_smiles.get(str(r.get("smiles", "")))
+        primary = ""
+        if tg is not None and str(tg) != "None":
+            for sym in [s.strip() for s in str(tg).split(",") if s.strip()]:
+                ens = s2e.get(sym, sym)
+                if ens in gset:
+                    primary = ens
+                    break
+        rows.append({"treatment": r["treatment"], "target_gene": primary})
+
+    out = pd.DataFrame(rows)
+    pth = priors_dir(dataset) / "drug_targets.parquet"
+    out.to_parquet(pth)
+    n_tgt = int((out["target_gene"] != "").sum())
+    (priors_dir(dataset) / "drug_targets.meta.json").write_text(json.dumps(
+        {"source": str(meta_path.name), "n_drugs": len(out), "n_with_in_space_target": n_tgt},
+        indent=2))
+    return out
+
+
+def load_drug_targets(dataset: str) -> dict[str, str]:
+    """Load drug->target (treatment -> Ensembl) mapping; build it if absent. Empty string = no target."""
+    p = priors_dir(dataset) / "drug_targets.parquet"
+    df = pd.read_parquet(p) if p.exists() else build_drug_targets(dataset)
+    return {t: g for t, g in zip(df["treatment"], df["target_gene"]) if g}

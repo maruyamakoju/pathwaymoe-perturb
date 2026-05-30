@@ -277,9 +277,15 @@ def train(
     use_grn_mask: Optional[bool] = None,
     latent_grn: bool = False,
     latent_grn_kl_weight: Optional[float] = None,
+    with_targets: bool = False,
     tag: str = ""
 ) -> Dict[str, Any]:
-    """High-level training entry point."""
+    """High-level training entry point.
+
+    ``with_targets`` activates the drug->target mechanism (the model receives which gene each drug
+    hits); default False reproduces existing checkpoints. It is recorded in the checkpoint so eval
+    rebuilds the matching ``build_shared``.
+    """
     tc = tc or TrainConfig(seed=seed)
     if tc.deterministic:
         torch.manual_seed(seed)
@@ -296,7 +302,7 @@ def train(
     # 1. Load Data & Priors
     df = load_conditions(dataset)
     genes = load_genes(dataset)
-    shared = build_shared(dataset, df)
+    shared = build_shared(dataset, df, with_targets=with_targets)
     n_genes, cb_dim = shared["n_genes"], shared["cb_dim"]
     
     gp, _ = load_pathways(dataset)
@@ -334,6 +340,7 @@ def train(
         "best_val_deg50": results["best_val_deg50"],
         "variant": variant,
         "split": split,
+        "with_targets": bool(with_targets),
         "train_cfg": tc.to_dict()
     })
     

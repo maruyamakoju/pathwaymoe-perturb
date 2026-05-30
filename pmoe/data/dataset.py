@@ -18,12 +18,19 @@ from torch.utils.data import DataLoader, Dataset
 from pmoe.data.loader import load_conditions, load_genes, stack_arrays
 
 
-def build_shared(dataset: str, df) -> dict:
+def build_shared(dataset: str, df, with_targets: bool = False) -> dict:
     """Pre-stack the per-condition arrays the model/dataset reuse across indices.
 
     Returns a dict of dense arrays: ``ctrl, lfc, deg, dose_log, chemberta, target_idx`` plus the
     scalars ``cb_dim`` and ``n_genes``. ChemBERTa features and target indices are resolved via the
     drug-feature table and the gene vocabulary.
+
+    ``with_targets`` (default False) controls the drug->target mechanism. When False, ``target_idx``
+    comes from the conditions' ``target_gene`` column (empty on real Tahoe -> all -1, the model's
+    target embedding is zeroed); this reproduces every existing checkpoint. When True, the per-drug
+    primary target gene (external knowledge, :func:`pmoe.priors.drugs.load_drug_targets`) is looked up
+    by ``treatment`` so the model receives which gene each drug hits. The target is biological prior
+    knowledge, not derived from test expression, so it is leakage-free even on unseen_drug.
     """
     from pmoe.priors.drugs import load_drug_feats  # local import: built in parallel (Agent B)
 
@@ -33,7 +40,12 @@ def build_shared(dataset: str, df) -> dict:
     cb_map = {t: np.asarray(r, np.float32) for t, r in dfeats["chemberta"].items()}
     cb_dim = len(next(iter(cb_map.values())))
     chemberta = np.stack([cb_map.get(t, np.zeros(cb_dim, np.float32)) for t in df["treatment"]])
-    target_idx = np.array([gidx.get(t, -1) for t in df["target_gene"].fillna("")], np.int64)
+    if with_targets:
+        from pmoe.priors.drugs import load_drug_targets
+        t2ens = load_drug_targets(dataset)  # treatment -> Ensembl (drugs with an in-space target)
+        target_idx = np.array([gidx.get(t2ens.get(tr, ""), -1) for tr in df["treatment"]], np.int64)
+    else:
+        target_idx = np.array([gidx.get(t, -1) for t in df["target_gene"].fillna("")], np.int64)
     return {
         "ctrl": stack_arrays(df, "ctrl_mean"),
         "lfc": stack_arrays(df, "lfc"),
