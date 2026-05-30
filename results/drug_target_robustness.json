@@ -1,0 +1,25 @@
+{
+  "description": "Robustness checks for the drug->target mechanistic-feature lever (results/drug_target_tahoe_full_unseen_drug.json). All numbers recomputed from checkpoints, CPU-deterministic eval.",
+  "coverage": {
+    "drugs_total": 212,
+    "drugs_in_tahoe_drug_metadata_with_target": 136,
+    "drugs_with_in_space_target_name_exact": 57,
+    "drugs_with_in_space_target_name_plus_smiles": 58,
+    "test_conditions_total": 1708,
+    "test_conditions_covered": 670,
+    "note": "Coverage is intrinsically capped by the 2000-HVG gene space (most drug targets are not HVGs), NOT a name-matching gap; name+SMILES matching moves 57->58 drugs."
+  },
+  "subset_covered_only": {
+    "split": "unseen_drug", "seeds": [1337, 1, 2], "eval": "cpu_deterministic",
+    "ALL":          {"n_clusters": 39, "none": 0.6289, "drug_target": 0.6317, "delta": 0.0027, "ci": [-0.086, 0.091], "p": 0.927},
+    "COVERED_ONLY": {"n_clusters": 14, "none": 0.6402, "drug_target": 0.6125, "delta": -0.0277, "ci": [-0.187, 0.142], "p": 0.742},
+    "conclusion": "The full-set null is not dilution by uncovered conditions; on covered conditions the effect is if anything slightly negative and clearly ns."
+  },
+  "synthetic_positive_control": {
+    "dataset": "synthetic_hard_big", "split": "unseen_drug", "regime": "novel_target",
+    "seeds": [1337, 1, 2], "eval": "cpu_deterministic", "n_test": 1230, "n_clusters": 39,
+    "targets_on_deg50": 0.3128, "targets_off_deg50": 0.0608,
+    "delta_on_minus_off": 0.2519, "ci": [0.1454, 0.3707], "p": 0.0005,
+    "conclusion": "The target-embedding pathway is FUNCTIONAL and large when targets carry signal; the real-Tahoe null is therefore a genuine biological/coverage result, not a plumbing bug."
+  }
+}
