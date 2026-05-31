@@ -11,9 +11,13 @@ and the **injection mechanism** (hard attention mask vs soft GNN message-passing
 
 > A structured GRN prior confers **no significant benefit** for OOD perturbation prediction **where
 > prediction is feasible** — on a 22.6M-cell real Tahoe-100M subset and on synthetic data with shared
-> drug targets it is *redundant* (a flexible model learns the response directly). The true GRN only
-> *plausibly* helps for **novel targets** (+0.05–0.08 DEG-Pearson, meaningful but not significant),
-> a near-unpredictable regime, and the **injection mechanism does not matter**.
+> drug targets it is *redundant* (a flexible model learns the response directly). This holds across the
+> whole **quality spectrum**: generic (TRRUST), signed-weighted, **dense curated (CollecTRI, 4× denser
+> — indistinguishable from random at the same density)**, and data-derived GRNs. A different kind of
+> prior — **drug→target mechanistic grounding** — is *also* null on OOD (a synthetic positive control
+> confirms the pathway works, so the null is real, not a plumbing bug). The true GRN only *plausibly*
+> helps for **novel targets** (+0.05–0.08 DEG-Pearson, meaningful but not significant), a
+> near-unpredictable regime, and the **injection mechanism does not matter**.
 
 | Model (unseen-drug, 39 drug clusters, cluster-bootstrap 95% CI) | DEG-Pearson@50 |
 |---|---|
@@ -33,7 +37,11 @@ and the **injection mechanism** (hard attention mask vs soft GNN message-passing
 
 Full numbers, synthetic positive control, and discussion: [`results/PAPER.md`](results/PAPER.md).
 One-page summary + the money figure: [`results/SUMMARY.md`](results/SUMMARY.md).
-Methodology critique + the three result-invalidating bugs we caught: [`AUDIT.md`](AUDIT.md).
+Methodology audit trail — every result-invalidating bug we caught and fixed (items A–P, incl. GRN
+test-set leakage, a silent train-without-GRN fallback, bf16/CUDA non-determinism, a p-value floor, and
+a fabricated-number near-miss caught before it entered git): [`AUDIT.md`](AUDIT.md). This audit log is
+a first-class artifact of the project — the negative result is only trustworthy because each of these
+was caught.
 
 ### Scope & honest framing (please don't over-read this)
 This is a rigorous **negative/limited result on one common design**: a GRN injected as an attention
@@ -50,10 +58,13 @@ pivoted to the controlled GRN-quality study); a head-to-head vs scGPT/STATE/Taho
   (`leakage_safe=true`); a regression test asserts test rows can't change the GRN.
 - **Cluster bootstrap** (resampling drugs/cell-lines, the real independent units) + **Holm**
   correction + pre-registered **minimum meaningful effect** (0.01); we report the # of test clusters.
-- **Deterministic fp32 eval**; headline numbers independently re-verified by direct recompute.
-- **43 unit/integration tests** incl. a leakage regression test.
-- We caught and fixed **three result-invalidating bugs** (test-set GRN leakage; a silent
-  train-without-GRN fallback; bf16 metric nondeterminism) — see `AUDIT.md` (items A, J, K).
+- **Deterministic CPU eval** for near-zero-variance regimes; headline numbers independently
+  re-verified by direct recompute from checkpoints.
+- **67 unit/integration tests** incl. a leakage regression test and a checkpoint-roundtrip test.
+- We caught and fixed **several result-invalidating bugs** — test-set GRN leakage (A), a silent
+  train-without-GRN fallback (J), bf16/CUDA metric non-determinism (K, N), and a paired-bootstrap
+  p-value floor that made every "p<0.001" a distributionally-impossible p=0 (M) — see `AUDIT.md`
+  (items A–P). One was a fabricated number caught *before* it reached git (O).
 
 ## Package layout (`pmoe/`)
 
